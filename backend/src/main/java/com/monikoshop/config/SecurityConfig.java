@@ -60,6 +60,7 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(List.of("http://localhost:3000",
                 "http://localhost:5173",
                 "https://moniko-shop-flax.vercel.app",
+                "https://moniko-shop-9454d5tjk-sep3r.vercel.app",
                 "http://frontend"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of("*"));
