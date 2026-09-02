@@ -4,18 +4,17 @@ import { useAuth } from './AuthContext';
 
 interface CartContextType {
   items: CartItem[];
-  addItem: (product: Product, quantity?: number) => void;
+  addItem: (product: Product, quantity?: number) => boolean;
   removeItem: (productId: number) => void;
   updateQuantity: (productId: number, quantity: number) => void;
   clearCart: () => void;
   totalItems: number;
   totalPrice: number;
+  requiresLogin: boolean;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 const STORAGE_PREFIX = 'moniko_cart_';
-// Cart for a logged-out visitor is kept separate from any account's cart.
-const guestKey = () => `${STORAGE_PREFIX}guest`;
 const userKey = (userId: number | string) => `${STORAGE_PREFIX}user_${userId}`;
 
 const loadCart = (key: string): CartItem[] => {
@@ -29,20 +28,18 @@ const loadCart = (key: string): CartItem[] => {
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const { user, loading } = useAuth();
-  // While auth is still resolving (e.g. on refresh, before /me returns),
-  // don't load/render a cart yet - loading the guest cart here and then
-  // swapping to the account cart a moment later is what let one account's
-  // cart flash into view under another account.
-  const activeKey = loading ? null : (user ? userKey(user.id) : guestKey());
+  // Only load cart when user is authenticated. Guests have no cart.
+  const activeKey = loading ? null : (user ? userKey(user.id) : null);
 
   const [storageKey, setStorageKey] = useState<string | null>(activeKey);
   const [items, setItems] = useState<CartItem[]>(() => (activeKey ? loadCart(activeKey) : []));
 
-  // Whenever the logged-in account changes (login, logout, or switching
-  // accounts), load that account's own cart instead of continuing to show
-  // whatever was previously in state.
   useEffect(() => {
-    if (activeKey === null) return;
+    if (activeKey === null) {
+      setStorageKey(null);
+      setItems([]);
+      return;
+    }
     setStorageKey(activeKey);
     setItems(loadCart(activeKey));
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -53,7 +50,11 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem(storageKey, JSON.stringify(items));
   }, [items, storageKey]);
 
-  const addItem = (product: Product, quantity = 1) => {
+  /** Returns false if user is not logged in (caller should redirect to login). */
+  const addItem = (product: Product, quantity = 1): boolean => {
+    if (!user) {
+      return false;
+    }
     setItems((prev) => {
       const existing = prev.find((i) => i.productId === product.id);
       const price = product.discountPrice ?? product.price;
@@ -73,6 +74,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         },
       ];
     });
+    return true;
   };
 
   const removeItem = (productId: number) => {
@@ -93,7 +95,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const totalPrice = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
 
   return (
-    <CartContext.Provider value={{ items, addItem, removeItem, updateQuantity, clearCart, totalItems, totalPrice }}>
+    <CartContext.Provider value={{ items, addItem, removeItem, updateQuantity, clearCart, totalItems, totalPrice, requiresLogin: !user && !loading }}>
       {children}
     </CartContext.Provider>
   );

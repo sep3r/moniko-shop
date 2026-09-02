@@ -31,6 +31,8 @@ public class Product {
 
     private BigDecimal discountPrice;
 
+    /** Image stored as data-URL base64 (data:image/...;base64,...) or optional external URL */
+    @Column(columnDefinition = "TEXT")
     private String imageUrl;
 
     private String brand;

@@ -41,10 +41,16 @@ export const orderApi = {
 };
 
 export const adminApi = {
-  // Products
+  // Products (multipart for image upload)
   getProducts: () => api.get('/admin/products'),
-  createProduct: (data: any) => api.post('/admin/products', data),
-  updateProduct: (id: number, data: any) => api.put(`/admin/products/${id}`, data),
+  createProduct: (formData: FormData) =>
+    api.post('/admin/products', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }),
+  updateProduct: (id: number, formData: FormData) =>
+    api.put(`/admin/products/${id}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }),
   deleteProduct: (id: number) => api.delete(`/admin/products/${id}`),
   // Categories
   getCategories: () => api.get('/admin/categories'),

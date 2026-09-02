@@ -48,7 +48,17 @@ export default function Category() {
                 <div className="product-brand">{product.brand}</div>
                 <div className="product-name">{product.name}</div>
                 <div className="product-price">
-                  <span className="price">{formatPrice(product.discountPrice ?? product.price)}</span>
+                  {product.discountPrice ? (
+                    <>
+                      <span className="price">{formatPrice(product.discountPrice)}</span>
+                      <span className="old-price">{formatPrice(product.price)}</span>
+                      <span className="discount-badge">
+                        {Math.round((1 - product.discountPrice / product.price) * 100)}٪
+                      </span>
+                    </>
+                  ) : (
+                    <span className="price">{formatPrice(product.price)}</span>
+                  )}
                 </div>
               </div>
             </Link>

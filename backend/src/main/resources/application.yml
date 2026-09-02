@@ -5,6 +5,11 @@ spring:
   application:
     name: monikoshop-backend
 
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 12MB
+
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/monikoshop}
     username: ${SPRING_DATASOURCE_USERNAME:monikoshop}
@@ -59,3 +64,4 @@ logging:
   level:
     com.monikoshop: INFO
     org.springframework.security: WARN
+

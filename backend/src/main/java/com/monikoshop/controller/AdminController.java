@@ -10,20 +10,27 @@ import com.monikoshop.repository.UserRepository;
 import com.monikoshop.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
+import java.util.Base64;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-// Admin panel: product/category/order/user management.
-// Every endpoint here is already locked to ROLE_ADMIN in SecurityConfig
-// via the "/api/admin/**" matcher.
 @RestController
 @RequestMapping("/api/admin")
 @RequiredArgsConstructor
 @CrossOrigin
 public class AdminController {
+
+    private static final Set<String> ALLOWED_TYPES = Set.of(
+            "image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp", "image/bmp"
+    );
+    private static final long MAX_IMAGE_BYTES = 5 * 1024 * 1024; // 5MB
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
@@ -37,17 +44,43 @@ public class AdminController {
         return ResponseEntity.ok(productRepository.findAll());
     }
 
-    @PostMapping("/products")
-    public ResponseEntity<Product> createProduct(@Valid @RequestBody ProductRequest request) {
-        Product product = applyToProduct(new Product(), request);
+    @PostMapping(value = "/products", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Product> createProduct(
+            @RequestParam String name,
+            @RequestParam(required = false) String description,
+            @RequestParam BigDecimal price,
+            @RequestParam(required = false) BigDecimal discountPrice,
+            @RequestParam(required = false) String brand,
+            @RequestParam Long categoryId,
+            @RequestParam Integer stock,
+            @RequestParam(required = false, defaultValue = "true") Boolean active,
+            @RequestParam(required = false) String imageUrl,
+            @RequestParam(required = false) MultipartFile image
+    ) {
+        Product product = new Product();
+        applyFields(product, name, description, price, discountPrice, brand, categoryId, stock, active);
+        product.setImageUrl(resolveImage(image, imageUrl, null));
         return ResponseEntity.ok(productRepository.save(product));
     }
 
-    @PutMapping("/products/{id}")
-    public ResponseEntity<Product> updateProduct(@PathVariable Long id, @Valid @RequestBody ProductRequest request) {
+    @PutMapping(value = "/products/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Product> updateProduct(
+            @PathVariable Long id,
+            @RequestParam String name,
+            @RequestParam(required = false) String description,
+            @RequestParam BigDecimal price,
+            @RequestParam(required = false) BigDecimal discountPrice,
+            @RequestParam(required = false) String brand,
+            @RequestParam Long categoryId,
+            @RequestParam Integer stock,
+            @RequestParam(required = false, defaultValue = "true") Boolean active,
+            @RequestParam(required = false) String imageUrl,
+            @RequestParam(required = false) MultipartFile image
+    ) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("محصول یافت نشد"));
-        product = applyToProduct(product, request);
+        applyFields(product, name, description, price, discountPrice, brand, categoryId, stock, active);
+        product.setImageUrl(resolveImage(image, imageUrl, product.getImageUrl()));
         return ResponseEntity.ok(productRepository.save(product));
     }
 
@@ -60,20 +93,50 @@ public class AdminController {
         return ResponseEntity.ok(new MessageResponse("محصول حذف شد"));
     }
 
-    private Product applyToProduct(Product product, ProductRequest request) {
-        Category category = categoryRepository.findById(request.getCategoryId())
-                .orElseThrow(() -> new RuntimeException("دسته‌بندی یافت نشد"));
+    /**
+     * Priority: new uploaded file (as base64 data-URL) > explicit imageUrl param > keep existing.
+     * No files are written to disk; everything stays in the DB column.
+     */
+    private String resolveImage(MultipartFile image, String imageUrl, String existing) {
+        if (image != null && !image.isEmpty()) {
+            return toBase64DataUrl(image);
+        }
+        if (imageUrl != null) {
+            return imageUrl.isBlank() ? null : imageUrl;
+        }
+        return existing;
+    }
 
-        product.setName(request.getName());
-        product.setDescription(request.getDescription());
-        product.setPrice(request.getPrice());
-        product.setDiscountPrice(request.getDiscountPrice());
-        product.setImageUrl(request.getImageUrl());
-        product.setBrand(request.getBrand());
+    private String toBase64DataUrl(MultipartFile file) {
+        String contentType = file.getContentType();
+        if (contentType == null || !ALLOWED_TYPES.contains(contentType.toLowerCase())) {
+            throw new RuntimeException("فقط فایل‌های تصویری مجاز هستند (jpg, png, gif, webp)");
+        }
+        if (file.getSize() > MAX_IMAGE_BYTES) {
+            throw new RuntimeException("حجم تصویر نباید بیشتر از ۵ مگابایت باشد");
+        }
+        try {
+            byte[] bytes = file.getBytes();
+            String b64 = Base64.getEncoder().encodeToString(bytes);
+            return "data:" + contentType + ";base64," + b64;
+        } catch (Exception e) {
+            throw new RuntimeException("خطا در خواندن تصویر: " + e.getMessage());
+        }
+    }
+
+    private void applyFields(Product product, String name, String description, BigDecimal price,
+                             BigDecimal discountPrice, String brand, Long categoryId,
+                             Integer stock, Boolean active) {
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new RuntimeException("دسته‌بندی یافت نشد"));
+        product.setName(name);
+        product.setDescription(description);
+        product.setPrice(price);
+        product.setDiscountPrice(discountPrice);
+        product.setBrand(brand);
         product.setCategory(category);
-        product.setStock(request.getStock());
-        product.setActive(request.getActive() == null || request.getActive());
-        return product;
+        product.setStock(stock);
+        product.setActive(active == null || active);
     }
 
     // ---- Categories ----
