@@ -62,6 +62,7 @@ public class SecurityConfig {
                 "https://moniko-shop-flax.vercel.app",
                 "https://moniko-shop-9454d5tjk-sep3r.vercel.app",
                 "https://moniko-shop-ei9pnlh5t-sep3r.vercel.app",
+                "https://moniko-shop-dqhzapt52-sep3r.vercel.app",
                 "http://frontend"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of("*"));
