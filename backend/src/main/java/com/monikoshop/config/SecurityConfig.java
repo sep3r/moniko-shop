@@ -59,9 +59,8 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of("http://localhost:3000",
                 "http://localhost:5173",
-                "https://moniko-shop.vercel.app",
-                "moniko-shop-54lcr1zsg-sep3r.vercel.app",
-                "https://moniko-shop-2v8nojeja-sep3r.vercel.app",
+                "https://moniko-shop.vercel.app/",
+                "https://moniko-shop-3u1fpgibn-sep3r.vercel.app",
                 "http://frontend"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of("*"));
