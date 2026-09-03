@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
+import java.util.Base64;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -54,14 +55,15 @@ public class AdminController {
             @RequestParam Integer stock,
             @RequestParam(required = false, defaultValue = "true") Boolean active,
             @RequestParam(required = false) String imageUrl,
-            @RequestParam(required = false) MultipartFile image
+            @RequestParam(required = false) MultipartFile image,
+            jakarta.servlet.http.HttpServletRequest httpRequest
     ) {
         Product product = new Product();
         applyFields(product, name, description, price, discountPrice, brand, categoryId, stock, active);
-        applyImage(product, image, imageUrl, null);
+        applyImage(product, image, imageUrl, httpRequest);
         Product saved = productRepository.save(product);
         if (saved.getImageData() != null) {
-            saved.setImageUrl("/api/products/" + saved.getId() + "/image");
+            saved.setImageUrl(buildImageUrl(httpRequest, saved.getId()));
             saved = productRepository.save(saved);
         }
         return ResponseEntity.ok(saved);
@@ -79,15 +81,16 @@ public class AdminController {
             @RequestParam Integer stock,
             @RequestParam(required = false, defaultValue = "true") Boolean active,
             @RequestParam(required = false) String imageUrl,
-            @RequestParam(required = false) MultipartFile image
+            @RequestParam(required = false) MultipartFile image,
+            jakarta.servlet.http.HttpServletRequest httpRequest
     ) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("محصول یافت نشد"));
         applyFields(product, name, description, price, discountPrice, brand, categoryId, stock, active);
-        applyImage(product, image, imageUrl, product.getImageUrl());
+        applyImage(product, image, imageUrl, httpRequest);
         Product saved = productRepository.save(product);
         if (saved.getImageData() != null) {
-            saved.setImageUrl("/api/products/" + saved.getId() + "/image");
+            saved.setImageUrl(buildImageUrl(httpRequest, saved.getId()));
             saved = productRepository.save(saved);
         }
         return ResponseEntity.ok(saved);
@@ -102,35 +105,24 @@ public class AdminController {
         return ResponseEntity.ok(new MessageResponse("محصول حذف شد"));
     }
 
-    /**
-     * Uploaded images are stored as raw bytes in PostgreSQL BYTEA.
-     * Existing external image URLs remain supported for backwards compatibility.
-     */
-    private void applyImage(Product product, MultipartFile image, String imageUrl, String existingImageUrl) {
+    private void applyImage(Product product, MultipartFile image, String imageUrl,
+                            jakarta.servlet.http.HttpServletRequest request) {
         if (image != null && !image.isEmpty()) {
             validateImage(image);
             try {
                 product.setImageData(image.getBytes());
-                product.setImageContentType(image.getContentType());
-                product.setImageUrl(null);
+                product.setImageContentType(image.getContentType().toLowerCase());
+                product.setImageUrl(buildImageUrl(request, product.getId()));
             } catch (Exception e) {
-                throw new RuntimeException("خطا در خواندن تصویر: " + e.getMessage());
+                throw new RuntimeException("خطا در ذخیره تصویر: " + e.getMessage());
             }
             return;
         }
 
-        // On edit, the frontend sends the current /api/products/{id}/image URL.
-        // In that case keep the existing BYTEA instead of clearing it.
-        if (imageUrl != null && imageUrl.equals(existingImageUrl)) {
-            return;
-        }
-
         if (imageUrl != null) {
+            product.setImageUrl(imageUrl.isBlank() ? null : imageUrl);
             product.setImageData(null);
             product.setImageContentType(null);
-            product.setImageUrl(imageUrl.isBlank() ? null : imageUrl);
-        } else {
-            product.setImageUrl(existingImageUrl);
         }
     }
 
@@ -144,19 +136,15 @@ public class AdminController {
         }
     }
 
-    private void applyFields(Product product, String name, String description, BigDecimal price,
-                             BigDecimal discountPrice, String brand, Long categoryId,
-                             Integer stock, Boolean active) {
-        Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new RuntimeException("دسته‌بندی یافت نشد"));
-        product.setName(name);
-        product.setDescription(description);
-        product.setPrice(price);
-        product.setDiscountPrice(discountPrice);
-        product.setBrand(brand);
-        product.setCategory(category);
-        product.setStock(stock);
-        product.setActive(active == null || active);
+    private String buildImageUrl(jakarta.servlet.http.HttpServletRequest request, Long productId) {
+        String base = request.getRequestURL().toString();
+        int adminIndex = base.indexOf("/api/admin/products");
+        if (adminIndex >= 0) {
+            base = base.substring(0, adminIndex);
+        }
+        // New product has no id until flush; save will assign it. The response
+        // is normalized by ProductImageController/client after persistence.
+        return base + "/api/products/" + (productId == null ? "" : productId) + "/image";
     }
 
     // ---- Categories ----

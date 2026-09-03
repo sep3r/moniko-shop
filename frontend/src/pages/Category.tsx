@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { productApi, resolveImageUrl } from '../services/api';
+import { productApi } from '../services/api';
 import { Product } from '../types';
+import { getProductImageUrl, FALLBACK_IMAGE } from '../utils/imageUrl';
 
 const formatPrice = (price: number) => new Intl.NumberFormat('fa-IR').format(price) + ' تومان';
 
@@ -43,7 +44,7 @@ export default function Category() {
         <div className="products-grid">
           {products.map((product) => (
             <Link to={`/products/${product.id}`} key={product.id} className="product-card">
-              <img src={resolveImageUrl(product.imageUrl) || 'https://via.placeholder.com/300'} alt={product.name} />
+              <img src={product.imageUrl || 'https://via.placeholder.com/300'} alt={product.name} />
               <div className="product-info">
                 <div className="product-brand">{product.brand}</div>
                 <div className="product-name">{product.name}</div>

@@ -1,11 +1,9 @@
 package com.monikoshop.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -35,19 +33,17 @@ public class Product {
     private BigDecimal discountPrice;
 
     /**
-     * Kept for backwards compatibility with existing products that use an external URL.
-     * For newly uploaded images this contains /api/products/{id}/image.
+     * Legacy/external image URL. For uploaded product images this contains the
+     * public API URL that serves the bytes stored in PostgreSQL.
      */
     @Column(columnDefinition = "TEXT")
     private String imageUrl;
 
-    /** Actual uploaded image bytes stored in PostgreSQL BYTEA. */
+    /** Raw image bytes stored directly in PostgreSQL BYTEA. */
     @JsonIgnore
-    @JdbcTypeCode(SqlTypes.LONGVARBINARY)
     @Column(name = "image_data", columnDefinition = "BYTEA")
     private byte[] imageData;
 
-    /** MIME type needed when the image is served back to the browser. */
     @JsonIgnore
     @Column(name = "image_content_type", length = 100)
     private String imageContentType;

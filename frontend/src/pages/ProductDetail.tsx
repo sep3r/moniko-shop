@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import { productApi, resolveImageUrl } from '../services/api';
+import { productApi } from '../services/api';
 import { Product } from '../types';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import { getProductImageUrl, FALLBACK_IMAGE } from '../utils/imageUrl';
 
 const formatPrice = (price: number) => new Intl.NumberFormat('fa-IR').format(price) + ' تومان';
 
@@ -56,7 +57,7 @@ export default function ProductDetail() {
   return (
     <div className="container">
       <div className="product-detail">
-        <img src={resolveImageUrl(product.imageUrl) || 'https://via.placeholder.com/400'} alt={product.name} />
+        <img src={getProductImageUrl(product.imageUrl, product.id) || FALLBACK_IMAGE} alt={product.name} />
         <div>
           <div className="product-brand">{product.brand}</div>
           <h1>{product.name}</h1>

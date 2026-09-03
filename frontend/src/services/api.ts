@@ -16,24 +16,13 @@ api.interceptors.request.use((config) => {
     config.headers.Authorization = `Bearer ${token}`;
   }
 
-  // Let the browser set multipart/form-data including its boundary.
-  if (config.data instanceof FormData) {
+  // Let the browser set multipart/form-data with its boundary.
+  if (typeof FormData !== 'undefined' && config.data instanceof FormData) {
     delete config.headers['Content-Type'];
   }
 
   return config;
 });
-
-
-export const resolveImageUrl = (imageUrl?: string) => {
-  if (!imageUrl) return '';
-  if (/^https?:\/\//i.test(imageUrl)) return imageUrl;
-  const base = API_URL.replace(/\/$/, '');
-  if (imageUrl.startsWith('/api/')) {
-    return base + imageUrl.substring(4);
-  }
-  return imageUrl;
-};
 
 export const authApi = {
   register: (data: { fullName: string; email: string; password: string; phone?: string }) =>

@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
-import { adminApi, resolveImageUrl } from '../../services/api';
+import { adminApi } from '../../services/api';
 import { Category, Product } from '../../types';
+import { getProductImageUrl, FALLBACK_IMAGE } from '../../utils/imageUrl';
 
 const formatPrice = (price: number) => new Intl.NumberFormat('fa-IR').format(price) + ' تومان';
 
@@ -60,7 +61,7 @@ export default function AdminProducts() {
       active: p.active,
     });
     setImageFile(null);
-    setPreviewUrl(resolveImageUrl(p.imageUrl) || null);
+    setPreviewUrl(p.imageUrl || null);
   };
 
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -218,7 +219,7 @@ export default function AdminProducts() {
             <tr key={p.id}>
               <td>
                 <img
-                  src={resolveImageUrl(p.imageUrl) || 'https://via.placeholder.com/48'}
+                  src={getProductImageUrl(p.imageUrl, p.id) || FALLBACK_IMAGE}
                   alt=""
                   style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 6, background: '#f5f5f5' }}
                 />
