@@ -44,12 +44,15 @@ export const adminApi = {
   // Products (multipart for image upload)
   getProducts: () => api.get('/admin/products'),
   createProduct: (formData: FormData) =>
+    // Do NOT set Content-Type manually: the browser must generate it itself
+    // (multipart/form-data; boundary=...). Setting it by hand drops the
+    // boundary and Spring rejects the request with 400.
     api.post('/admin/products', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+      headers: { 'Content-Type': undefined },
     }),
   updateProduct: (id: number, formData: FormData) =>
     api.put(`/admin/products/${id}`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+      headers: { 'Content-Type': undefined },
     }),
   deleteProduct: (id: number) => api.delete(`/admin/products/${id}`),
   // Categories
