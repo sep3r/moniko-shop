@@ -1,5 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { resolveImageUrl } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
 const formatPrice = (price: number) => new Intl.NumberFormat('fa-IR').format(price) + ' تومان';
@@ -42,7 +43,7 @@ export default function Cart() {
       <div className="cart-list">
         {items.map((item) => (
           <div className="cart-item" key={item.productId}>
-            <img src={item.imageUrl || 'https://via.placeholder.com/80'} alt={item.name} />
+            <img src={resolveImageUrl(item.imageUrl) || 'https://via.placeholder.com/80'} alt={item.name} />
             <div className="cart-item-info">
               <div className="product-name">{item.name}</div>
               <div className="price">{formatPrice(item.price)}</div>

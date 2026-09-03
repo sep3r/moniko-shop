@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import { productApi } from '../services/api';
+import { productApi, resolveImageUrl } from '../services/api';
 import { Product } from '../types';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
@@ -56,7 +56,7 @@ export default function ProductDetail() {
   return (
     <div className="container">
       <div className="product-detail">
-        <img src={product.imageUrl || 'https://via.placeholder.com/400'} alt={product.name} />
+        <img src={resolveImageUrl(product.imageUrl) || 'https://via.placeholder.com/400'} alt={product.name} />
         <div>
           <div className="product-brand">{product.brand}</div>
           <h1>{product.name}</h1>

@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
-import java.util.Base64;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -59,8 +58,13 @@ public class AdminController {
     ) {
         Product product = new Product();
         applyFields(product, name, description, price, discountPrice, brand, categoryId, stock, active);
-        product.setImageUrl(resolveImage(image, imageUrl, null));
-        return ResponseEntity.ok(productRepository.save(product));
+        applyImage(product, image, imageUrl, null);
+        Product saved = productRepository.save(product);
+        if (saved.getImageData() != null) {
+            saved.setImageUrl("/api/products/" + saved.getId() + "/image");
+            saved = productRepository.save(saved);
+        }
+        return ResponseEntity.ok(saved);
     }
 
     @PutMapping(value = "/products/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -80,8 +84,13 @@ public class AdminController {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("محصول یافت نشد"));
         applyFields(product, name, description, price, discountPrice, brand, categoryId, stock, active);
-        product.setImageUrl(resolveImage(image, imageUrl, product.getImageUrl()));
-        return ResponseEntity.ok(productRepository.save(product));
+        applyImage(product, image, imageUrl, product.getImageUrl());
+        Product saved = productRepository.save(product);
+        if (saved.getImageData() != null) {
+            saved.setImageUrl("/api/products/" + saved.getId() + "/image");
+            saved = productRepository.save(saved);
+        }
+        return ResponseEntity.ok(saved);
     }
 
     @DeleteMapping("/products/{id}")
@@ -94,33 +103,44 @@ public class AdminController {
     }
 
     /**
-     * Priority: new uploaded file (as base64 data-URL) > explicit imageUrl param > keep existing.
-     * No files are written to disk; everything stays in the DB column.
+     * Uploaded images are stored as raw bytes in PostgreSQL BYTEA.
+     * Existing external image URLs remain supported for backwards compatibility.
      */
-    private String resolveImage(MultipartFile image, String imageUrl, String existing) {
+    private void applyImage(Product product, MultipartFile image, String imageUrl, String existingImageUrl) {
         if (image != null && !image.isEmpty()) {
-            return toBase64DataUrl(image);
+            validateImage(image);
+            try {
+                product.setImageData(image.getBytes());
+                product.setImageContentType(image.getContentType());
+                product.setImageUrl(null);
+            } catch (Exception e) {
+                throw new RuntimeException("خطا در خواندن تصویر: " + e.getMessage());
+            }
+            return;
         }
+
+        // On edit, the frontend sends the current /api/products/{id}/image URL.
+        // In that case keep the existing BYTEA instead of clearing it.
+        if (imageUrl != null && imageUrl.equals(existingImageUrl)) {
+            return;
+        }
+
         if (imageUrl != null) {
-            return imageUrl.isBlank() ? null : imageUrl;
+            product.setImageData(null);
+            product.setImageContentType(null);
+            product.setImageUrl(imageUrl.isBlank() ? null : imageUrl);
+        } else {
+            product.setImageUrl(existingImageUrl);
         }
-        return existing;
     }
 
-    private String toBase64DataUrl(MultipartFile file) {
+    private void validateImage(MultipartFile file) {
         String contentType = file.getContentType();
         if (contentType == null || !ALLOWED_TYPES.contains(contentType.toLowerCase())) {
-            throw new RuntimeException("فقط فایل‌های تصویری مجاز هستند (jpg, png, gif, webp)");
+            throw new RuntimeException("فقط فایل‌های تصویری مجاز هستند (jpg, png, gif, webp, bmp)");
         }
         if (file.getSize() > MAX_IMAGE_BYTES) {
             throw new RuntimeException("حجم تصویر نباید بیشتر از ۵ مگابایت باشد");
-        }
-        try {
-            byte[] bytes = file.getBytes();
-            String b64 = Base64.getEncoder().encodeToString(bytes);
-            return "data:" + contentType + ";base64," + b64;
-        } catch (Exception e) {
-            throw new RuntimeException("خطا در خواندن تصویر: " + e.getMessage());
         }
     }
 

@@ -15,8 +15,25 @@ api.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+
+  // Let the browser set multipart/form-data including its boundary.
+  if (config.data instanceof FormData) {
+    delete config.headers['Content-Type'];
+  }
+
   return config;
 });
+
+
+export const resolveImageUrl = (imageUrl?: string) => {
+  if (!imageUrl) return '';
+  if (/^https?:\/\//i.test(imageUrl)) return imageUrl;
+  const base = API_URL.replace(/\/$/, '');
+  if (imageUrl.startsWith('/api/')) {
+    return base + imageUrl.substring(4);
+  }
+  return imageUrl;
+};
 
 export const authApi = {
   register: (data: { fullName: string; email: string; password: string; phone?: string }) =>
@@ -47,13 +64,9 @@ export const adminApi = {
     // Do NOT set Content-Type manually: the browser must generate it itself
     // (multipart/form-data; boundary=...). Setting it by hand drops the
     // boundary and Spring rejects the request with 400.
-    api.post('/admin/products', formData, {
-      headers: { 'Content-Type': undefined },
-    }),
+    api.post('/admin/products', formData),
   updateProduct: (id: number, formData: FormData) =>
-    api.put(`/admin/products/${id}`, formData, {
-      headers: { 'Content-Type': undefined },
-    }),
+    api.put(`/admin/products/${id}`, formData),
   deleteProduct: (id: number) => api.delete(`/admin/products/${id}`),
   // Categories
   getCategories: () => api.get('/admin/categories'),
