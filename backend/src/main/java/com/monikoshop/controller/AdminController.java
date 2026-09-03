@@ -105,6 +105,29 @@ public class AdminController {
         return ResponseEntity.ok(new MessageResponse("محصول حذف شد"));
     }
 
+    private void applyFields(
+            Product product,
+            String name,
+            String description,
+            BigDecimal price,
+            BigDecimal discountPrice,
+            String brand,
+            Long categoryId,
+            Integer stock,
+            Boolean active
+    ) {
+        product.setName(name);
+        product.setDescription(description);
+        product.setPrice(price);
+        product.setDiscountPrice(discountPrice);
+        product.setBrand(brand);
+        product.setStock(stock);
+        product.setActive(active != null ? active : true);
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new RuntimeException("دسته‌بندی یافت نشد"));
+        product.setCategory(category);
+    }
+
     private void applyImage(Product product, MultipartFile image, String imageUrl,
                             jakarta.servlet.http.HttpServletRequest request) {
         if (image != null && !image.isEmpty()) {
