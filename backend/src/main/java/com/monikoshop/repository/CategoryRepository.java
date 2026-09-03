@@ -16,8 +16,11 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     /** دسته‌های اصلی (بدون والد) به ترتیب sortOrder */
     List<Category> findByParentIsNullOrderBySortOrderAscIdAsc();
 
-    /** زیر‌دسته‌های یک والد */
-    List<Category> findByParentIdOrderBySortOrderAscIdAsc(Long parentId);
+    /**
+     * زیر‌دسته‌های یک والد.
+     * فیلد entity = parent (نه parentId)، پس باید از parent_Id استفاده شود.
+     */
+    List<Category> findByParent_IdOrderBySortOrderAscIdAsc(Long parentId);
 
     /** درخت کامل برای مگامنو: دسته‌های ریشه با children لود شده */
     @Query("SELECT DISTINCT c FROM Category c LEFT JOIN FETCH c.children WHERE c.parent IS NULL ORDER BY c.sortOrder ASC, c.id ASC")

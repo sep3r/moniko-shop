@@ -221,7 +221,7 @@ public class AdminController {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("دسته‌بندی یافت نشد"));
         // اگر زیر‌دسته دارد، حذف نشود
-        List<Category> children = categoryRepository.findByParentIdOrderBySortOrderAscIdAsc(id);
+        List<Category> children = categoryRepository.findByParent_IdOrderBySortOrderAscIdAsc(id);
         if (!children.isEmpty()) {
             throw new RuntimeException("ابتدا زیر‌دسته‌ها را حذف کنید (" + children.size() + " مورد)");
         }
