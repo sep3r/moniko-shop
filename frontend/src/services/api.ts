@@ -36,6 +36,8 @@ export const productApi = {
   getAll: () => api.get('/products'),
   getById: (id: number) => api.get(`/products/${id}`),
   getCategories: () => api.get('/categories'),
+  /** درخت کامل دسته‌ها برای مگامنو */
+  getCategoryTree: () => api.get('/categories/tree'),
   getByCategory: (slug: string) => api.get(`/categories/${slug}/products`),
 };
 
@@ -50,15 +52,13 @@ export const adminApi = {
   // Products (multipart for image upload)
   getProducts: () => api.get('/admin/products'),
   createProduct: (formData: FormData) =>
-    // Do NOT set Content-Type manually: the browser must generate it itself
-    // (multipart/form-data; boundary=...). Setting it by hand drops the
-    // boundary and Spring rejects the request with 400.
     api.post('/admin/products', formData),
   updateProduct: (id: number, formData: FormData) =>
     api.put(`/admin/products/${id}`, formData),
   deleteProduct: (id: number) => api.delete(`/admin/products/${id}`),
   // Categories
   getCategories: () => api.get('/admin/categories'),
+  getCategoryTree: () => api.get('/admin/categories/tree'),
   createCategory: (data: any) => api.post('/admin/categories', data),
   updateCategory: (id: number, data: any) => api.put(`/admin/categories/${id}`, data),
   deleteCategory: (id: number) => api.delete(`/admin/categories/${id}`),

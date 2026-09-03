@@ -1,6 +1,7 @@
 package com.monikoshop.controller;
 
 import com.monikoshop.dto.*;
+import com.monikoshop.dto.CategoryTreeResponse;
 import com.monikoshop.entity.Category;
 import com.monikoshop.entity.Product;
 import com.monikoshop.entity.User;
@@ -170,41 +171,78 @@ public class AdminController {
         return base + "/api/products/" + (productId == null ? "" : productId) + "/image";
     }
 
-    // ---- Categories ----
+    // ---- Categories (hierarchical) ----
 
     @GetMapping("/categories")
-    public ResponseEntity<List<Category>> getAllCategories() {
-        return ResponseEntity.ok(categoryRepository.findAll());
+    public ResponseEntity<List<CategoryTreeResponse>> getAllCategories() {
+        List<CategoryTreeResponse> list = categoryRepository.findAll().stream()
+                .map(CategoryTreeResponse::flat)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(list);
+    }
+
+    /** درخت کامل برای ادمین */
+    @GetMapping("/categories/tree")
+    public ResponseEntity<List<CategoryTreeResponse>> getCategoryTree() {
+        List<Category> roots = categoryRepository.findRootCategoriesWithChildren();
+        return ResponseEntity.ok(roots.stream()
+                .map(CategoryTreeResponse::from)
+                .collect(Collectors.toList()));
     }
 
     @PostMapping("/categories")
-    public ResponseEntity<Category> createCategory(@Valid @RequestBody CategoryRequest request) {
-        Category category = applyToCategory(new Category(), request);
-        return ResponseEntity.ok(categoryRepository.save(category));
+    public ResponseEntity<CategoryTreeResponse> createCategory(@Valid @RequestBody CategoryRequest request) {
+        if (categoryRepository.existsBySlug(request.getSlug())) {
+            throw new RuntimeException("اسلاگ تکراری است");
+        }
+        Category category = applyToCategory(new Category(), request, null);
+        Category saved = categoryRepository.save(category);
+        return ResponseEntity.ok(CategoryTreeResponse.flat(saved));
     }
 
     @PutMapping("/categories/{id}")
-    public ResponseEntity<Category> updateCategory(@PathVariable Long id, @Valid @RequestBody CategoryRequest request) {
+    public ResponseEntity<CategoryTreeResponse> updateCategory(@PathVariable Long id, @Valid @RequestBody CategoryRequest request) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("دسته‌بندی یافت نشد"));
-        category = applyToCategory(category, request);
-        return ResponseEntity.ok(categoryRepository.save(category));
+        if (categoryRepository.existsBySlugAndIdNot(request.getSlug(), id)) {
+            throw new RuntimeException("اسلاگ تکراری است");
+        }
+        // جلوگیری از حلقه: نمی‌تواند والد خودش یا فرزندش باشد
+        if (request.getParentId() != null && request.getParentId().equals(id)) {
+            throw new RuntimeException("دسته نمی‌تواند والد خودش باشد");
+        }
+        category = applyToCategory(category, request, id);
+        Category saved = categoryRepository.save(category);
+        return ResponseEntity.ok(CategoryTreeResponse.flat(saved));
     }
 
     @DeleteMapping("/categories/{id}")
     public ResponseEntity<MessageResponse> deleteCategory(@PathVariable Long id) {
-        if (!categoryRepository.existsById(id)) {
-            throw new RuntimeException("دسته‌بندی یافت نشد");
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("دسته‌بندی یافت نشد"));
+        // اگر زیر‌دسته دارد، حذف نشود
+        List<Category> children = categoryRepository.findByParentIdOrderBySortOrderAscIdAsc(id);
+        if (!children.isEmpty()) {
+            throw new RuntimeException("ابتدا زیر‌دسته‌ها را حذف کنید (" + children.size() + " مورد)");
         }
-        categoryRepository.deleteById(id);
+        categoryRepository.delete(category);
         return ResponseEntity.ok(new MessageResponse("دسته‌بندی حذف شد"));
     }
 
-    private Category applyToCategory(Category category, CategoryRequest request) {
+    private Category applyToCategory(Category category, CategoryRequest request, Long currentId) {
         category.setName(request.getName());
         category.setSlug(request.getSlug());
         category.setImageUrl(request.getImageUrl());
         category.setSortOrder(request.getSortOrder());
+
+        if (request.getParentId() != null) {
+            Category parent = categoryRepository.findById(request.getParentId())
+                    .orElseThrow(() -> new RuntimeException("دسته والد یافت نشد"));
+            // فقط یک سطح زیر‌دسته مجاز است (والد خودش نباید والد داشته باشد) — اختیاری
+            category.setParent(parent);
+        } else {
+            category.setParent(null);
+        }
         return category;
     }
 

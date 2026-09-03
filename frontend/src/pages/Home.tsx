@@ -15,7 +15,7 @@ export default function Home() {
 
     useEffect(() => {
         Promise.all([
-            productApi.getCategories(),
+            productApi.getCategoryTree(),  // فقط دسته‌های اصلی
             productApi.getAll(),
         ])
             .then(([catRes, prodRes]) => {

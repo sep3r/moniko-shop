@@ -21,6 +21,8 @@ export interface Category {
   slug: string;
   imageUrl?: string;
   sortOrder?: number;
+  parentId?: number | null;
+  children?: Category[];
 }
 
 export interface Product {

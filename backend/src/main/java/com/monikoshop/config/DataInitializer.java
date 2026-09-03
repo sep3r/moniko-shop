@@ -36,44 +36,55 @@ public class DataInitializer implements CommandLineRunner {
             userRepository.save(admin);
         }
 
-        // Seed categories
+        // Seed hierarchical categories
         if (categoryRepository.count() == 0) {
-            Category makeup = categoryRepository.save(Category.builder()
-                    .name("آرایشی")
-                    .slug("makeup")
-                    .imageUrl("https://via.placeholder.com/200x200?text=Makeup")
-                    .sortOrder(1)
-                    .build());
+            // ===== دسته‌های اصلی =====
+            Category makeup = saveRoot("آرایشی", "makeup", 1);
+            Category skincare = saveRoot("پوست", "skincare", 2);
+            Category hair = saveRoot("مو", "hair", 3);
+            Category body = saveRoot("بدن", "body", 4);
+            Category fragrance = saveRoot("عطر و ادکلن", "fragrance", 5);
+            Category health = saveRoot("سلامت", "health", 6);
 
-            Category skincare = categoryRepository.save(Category.builder()
-                    .name("مراقبت پوست")
-                    .slug("skincare")
-                    .imageUrl("https://via.placeholder.com/200x200?text=Skincare")
-                    .sortOrder(2)
-                    .build());
+            // ===== زیر‌دسته‌های آرایشی =====
+            saveChild(makeup, "آرایش صورت", "face-makeup", 1);
+            saveChild(makeup, "آرایش چشم", "eye-makeup", 2);
+            saveChild(makeup, "آرایش لب", "lip-makeup", 3);
+            saveChild(makeup, "آرایش ابرو", "brow-makeup", 4);
+            saveChild(makeup, "ابزار آرایشی", "makeup-tools", 5);
 
-            Category hair = categoryRepository.save(Category.builder()
-                    .name("مراقبت مو")
-                    .slug("hair")
-                    .imageUrl("https://via.placeholder.com/200x200?text=Hair")
-                    .sortOrder(3)
-                    .build());
+            // ===== زیر‌دسته‌های پوست =====
+            saveChild(skincare, "پاک‌کننده صورت", "face-cleanser", 1);
+            saveChild(skincare, "مرطوب‌کننده و آبرسان", "moisturizer", 2);
+            saveChild(skincare, "ضد آفتاب", "sunscreen", 3);
+            saveChild(skincare, "سرم پوست صورت", "face-serum", 4);
+            saveChild(skincare, "ماسک صورت و بدن", "face-mask", 5);
+            saveChild(skincare, "ضد چروک", "anti-aging", 6);
 
-            Category fragrance = categoryRepository.save(Category.builder()
-                    .name("عطر و ادکلن")
-                    .slug("fragrance")
-                    .imageUrl("https://via.placeholder.com/200x200?text=Fragrance")
-                    .sortOrder(4)
-                    .build());
+            // ===== زیر‌دسته‌های مو =====
+            saveChild(hair, "شامپو مو", "shampoo", 1);
+            saveChild(hair, "نرم‌کننده مو", "conditioner", 2);
+            saveChild(hair, "ماسک مو", "hair-mask", 3);
+            saveChild(hair, "روغن مو", "hair-oil", 4);
+            saveChild(hair, "حالت‌دهنده مو", "hair-styling", 5);
+            saveChild(hair, "ضد ریزش و تقویت‌کننده", "hair-growth", 6);
 
-            Category health = categoryRepository.save(Category.builder()
-                    .name("سلامت و مکمل")
-                    .slug("health")
-                    .imageUrl("https://via.placeholder.com/200x200?text=Health")
-                    .sortOrder(5)
-                    .build());
+            // ===== زیر‌دسته‌های بدن =====
+            saveChild(body, "شامپو بدن", "body-wash", 1);
+            saveChild(body, "لوسیون و کرم بدن", "body-lotion", 2);
+            saveChild(body, "اسپری و بادی اسپلش", "body-splash", 3);
+            saveChild(body, "ضد تعریق", "deodorant", 4);
 
-            // Seed products
+            // ===== زیر‌دسته‌های عطر =====
+            saveChild(fragrance, "عطر زنانه", "women-perfume", 1);
+            saveChild(fragrance, "عطر مردانه", "men-perfume", 2);
+            saveChild(fragrance, "عطر یونیسکس", "unisex-perfume", 3);
+
+            // ===== زیر‌دسته‌های سلامت =====
+            saveChild(health, "مکمل‌ها", "supplements", 1);
+            saveChild(health, "ویتامین‌ها", "vitamins", 2);
+
+            // ===== محصولات نمونه =====
             productRepository.save(Product.builder()
                     .name("کرم پودر مات برند X")
                     .description("کرم پودر با پوشش کامل و ماندگاری بالا، مناسب پوست چرب")
@@ -144,5 +155,24 @@ public class DataInitializer implements CommandLineRunner {
                     .active(true)
                     .build());
         }
+    }
+
+    private Category saveRoot(String name, String slug, int order) {
+        return categoryRepository.save(Category.builder()
+                .name(name)
+                .slug(slug)
+                .imageUrl("https://via.placeholder.com/200x200?text=" + slug)
+                .sortOrder(order)
+                .parent(null)
+                .build());
+    }
+
+    private Category saveChild(Category parent, String name, String slug, int order) {
+        return categoryRepository.save(Category.builder()
+                .name(name)
+                .slug(slug)
+                .sortOrder(order)
+                .parent(parent)
+                .build());
     }
 }

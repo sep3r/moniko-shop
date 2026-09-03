@@ -15,4 +15,7 @@ public class CategoryRequest {
     private String imageUrl;
 
     private Integer sortOrder;
+
+    /** شناسه دسته والد (null = دسته اصلی سطح اول) */
+    private Long parentId;
 }
