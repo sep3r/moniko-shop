@@ -1,3 +1,4 @@
+```tsx
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { productApi } from '../services/api';
@@ -23,7 +24,9 @@ export default function Home() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <div className="loading">در حال بارگذاری...</div>;
+  if (loading) {
+    return <div className="loading">در حال بارگذاری...</div>;
+  }
 
   return (
     <>
@@ -35,42 +38,96 @@ export default function Home() {
       </section>
 
       <div className="container">
+
+        {/* Categories */}
         <h2 className="section-title">دسته‌بندی‌ها</h2>
+
         <div className="categories">
           {categories.map((cat) => (
-            <Link to={`/categories/${cat.slug}`} key={cat.id} className="category-card">
-              <img src={cat.imageUrl || 'https://via.placeholder.com/80'} alt={cat.name} />
+            <Link
+              to={`/categories/${cat.slug}`}
+              key={cat.id}
+              className="category-card"
+            >
+              <img
+                src={cat.imageUrl || 'https://via.placeholder.com/80'}
+                alt={cat.name}
+                onError={(e) => {
+                  e.currentTarget.src = 'https://via.placeholder.com/80';
+                }}
+              />
+
               <h3>{cat.name}</h3>
             </Link>
           ))}
         </div>
 
+        {/* Products */}
         <h2 className="section-title">محصولات منتخب</h2>
+
         <div className="products-grid">
-          {products.map((product) => (
-            <Link to={`/products/${product.id}`} key={product.id} className="product-card">
-              <img src={product.imageUrl || 'https://via.placeholder.com/300'} alt={product.name} />
-              <div className="product-info">
-                <div className="product-brand">{product.brand}</div>
-                <div className="product-name">{product.name}</div>
-                <div className="product-price">
-                  {product.discountPrice ? (
-                    <>
-                      <span className="price">{formatPrice(product.discountPrice)}</span>
-                      <span className="old-price">{formatPrice(product.price)}</span>
-                      <span className="discount-badge">
-                        {Math.round((1 - product.discountPrice / product.price) * 100)}٪
+          {products.map((product) => {
+
+            const imageUrl = getProductImageUrl(product);
+
+            return (
+              <Link
+                to={`/products/${product.id}`}
+                key={product.id}
+                className="product-card"
+              >
+                <img
+                  src={imageUrl || FALLBACK_IMAGE}
+                  alt={product.name}
+                  onError={(e) => {
+                    e.currentTarget.src = FALLBACK_IMAGE;
+                  }}
+                />
+
+                <div className="product-info">
+
+                  <div className="product-brand">
+                    {product.brand}
+                  </div>
+
+                  <div className="product-name">
+                    {product.name}
+                  </div>
+
+                  <div className="product-price">
+
+                    {product.discountPrice ? (
+                      <>
+                        <span className="price">
+                          {formatPrice(product.discountPrice)}
+                        </span>
+
+                        <span className="old-price">
+                          {formatPrice(product.price)}
+                        </span>
+
+                        <span className="discount-badge">
+                          {Math.round(
+                            (1 - product.discountPrice / product.price) * 100
+                          )}٪
+                        </span>
+                      </>
+                    ) : (
+                      <span className="price">
+                        {formatPrice(product.price)}
                       </span>
-                    </>
-                  ) : (
-                    <span className="price">{formatPrice(product.price)}</span>
-                  )}
+                    )}
+
+                  </div>
+
                 </div>
-              </div>
-            </Link>
-          ))}
+              </Link>
+            );
+          })}
         </div>
+
       </div>
     </>
   );
 }
+```
