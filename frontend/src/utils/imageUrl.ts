@@ -1,4 +1,8 @@
-const API_BASE = 'https://moniko-shop-production.up.railway.app';
+// آدرس بک‌اند از VITE_API_URL گرفته می‌شود (مثلاً https://xxx.runflare.run/api)
+// و پسوند /api برای ساخت آدرس تصاویر حذف می‌شود.
+const API_BASE = ((import.meta.env.VITE_API_URL as string | undefined) || '')
+    .replace(/\/api\/?$/, '')
+    .replace(/\/$/, '');
 
 export function getProductImageUrl(
     imageUrl?: string | null,

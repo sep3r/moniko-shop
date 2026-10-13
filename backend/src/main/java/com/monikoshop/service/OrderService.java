@@ -2,7 +2,6 @@ package com.monikoshop.service;
 
 import com.monikoshop.dto.*;
 import com.monikoshop.entity.*;
-import com.monikoshop.kafka.OrderEventProducer;
 import com.monikoshop.repository.OrderRepository;
 import com.monikoshop.repository.ProductRepository;
 import com.monikoshop.repository.UserRepository;
@@ -23,7 +22,6 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
-    private final OrderEventProducer orderEventProducer;
 
     private User currentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -76,7 +74,6 @@ public class OrderService {
         order.setTotalAmount(total);
         order = orderRepository.save(order);
 
-        orderEventProducer.sendOrderCreatedEvent(order.getId(), user.getId(), order.getTotalAmount());
 
         return toResponse(order, false);
     }
@@ -110,7 +107,6 @@ public class OrderService {
                 .orElseThrow(() -> new RuntimeException("سفارش یافت نشد"));
         order.setStatus(status);
         order = orderRepository.save(order);
-        orderEventProducer.sendOrderStatusChangedEvent(order.getId(), status.name());
         return toResponse(order, true);
     }
 

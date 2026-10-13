@@ -34,6 +34,9 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final UserDetailsServiceImpl userDetailsService;
 
+    @org.springframework.beans.factory.annotation.Value("${CORS_ALLOWED_ORIGINS:}")
+    private String corsAllowedOrigins;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -57,11 +60,19 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000",
+        List<String> patterns = new java.util.ArrayList<>(List.of(
+                "http://localhost:3000",
                 "http://localhost:5173",
+                "http://frontend",
                 "https://moniko-shop.vercel.app",
-                "https://moniko-shop-3u1fpgibn-sep3r.vercel.app",
-                "http://frontend"));
+                "https://*.vercel.app"));
+        // دامنه‌های اضافه (مثلاً دامنه اختصاصی) از متغیر محیطی، با کاما جدا شوند
+        if (corsAllowedOrigins != null && !corsAllowedOrigins.isBlank()) {
+            for (String o : corsAllowedOrigins.split(",")) {
+                if (!o.isBlank()) patterns.add(o.trim());
+            }
+        }
+        configuration.setAllowedOriginPatterns(patterns);
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);

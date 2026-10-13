@@ -3,7 +3,6 @@ package com.monikoshop.service;
 import com.monikoshop.dto.*;
 import com.monikoshop.entity.Role;
 import com.monikoshop.entity.User;
-import com.monikoshop.kafka.UserEventProducer;
 import com.monikoshop.repository.UserRepository;
 import com.monikoshop.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +26,6 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
-    private final UserEventProducer userEventProducer;
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {
@@ -46,8 +44,6 @@ public class AuthService {
 
         user = userRepository.save(user);
 
-        // Send Kafka event
-        userEventProducer.sendUserRegisteredEvent(user.getId(), user.getEmail(), user.getFullName());
 
         UserDetails userDetails = org.springframework.security.core.userdetails.User.builder()
                 .username(user.getEmail())
@@ -80,8 +76,6 @@ public class AuthService {
         User user = userRepository.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new RuntimeException("کاربر یافت نشد"));
 
-        // Send Kafka event
-        userEventProducer.sendUserLoginEvent(user.getId(), user.getEmail());
 
         String token = jwtUtil.generateToken(userDetails);
 

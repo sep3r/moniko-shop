@@ -1,22 +1,23 @@
 # MonikoShop - فروشگاه آنلاین
 
-پروژه اسکلت فروشگاه آنلاین لوازم آرایشی و بهداشتی با تکنولوژی‌های:
+پروژه فروشگاه آنلاین لوازم آرایشی و بهداشتی.
 
-- **Backend**: Java 25 + Spring Boot 3.5 + Spring Security + JWT + Spring Kafka + PostgreSQL
+## فناوری‌ها
+
+- **Backend**: Java 21 + Spring Boot 3.5 + Spring Security + JWT + Spring Data JPA + PostgreSQL
 - **Frontend**: React 18 + TypeScript + Vite + React Router
-- **Infrastructure**: Docker Compose + Kafka (KRaft) + Postgres
+- **Infrastructure**: Docker Compose + PostgreSQL
+- **پیام‌رسانی**: این نسخه به Kafka وابستگی ندارد.
 
-## ویژگی‌های فعلی
+## ویژگی‌ها
 
 - ثبت‌نام و ورود با JWT
 - نقش‌های USER و ADMIN
-- ارسال رویداد به Kafka هنگام ثبت‌نام، لاگین و ثبت سفارش
 - صفحه اصلی با دسته‌بندی و محصولات نمونه
-- **سبد خرید واقعی** (ذخیره در مرورگر) + تکمیل خرید و ثبت سفارش
-- **پنل کاربری**: مشاهده پروفایل و تاریخچه سفارش‌ها (`/profile`, `/orders`)
-- **پنل مدیریت** (`/admin`, فقط برای ADMIN): مدیریت محصولات، دسته‌بندی‌ها، سفارش‌ها (تغییر وضعیت) و کاربران (فعال/غیرفعال، ارتقا به ادمین)
-- RTL و رابط کاربری فارسی
-- Docker کامل
+- سبد خرید در مرورگر و ثبت سفارش
+- پنل کاربری و تاریخچه سفارش‌ها
+- پنل مدیریت محصولات، دسته‌بندی‌ها، سفارش‌ها و کاربران
+- رابط کاربری فارسی و RTL
 
 ## اجرا با Docker
 
@@ -26,35 +27,27 @@ docker compose up --build
 
 - Frontend: http://localhost:3000
 - Backend API: http://localhost:8080
-- Postgres: localhost:5432
-- Kafka: localhost:9092
+- PostgreSQL: localhost:5432
 
 ### حساب ادمین پیش‌فرض
 - ایمیل: `admin@monikoshop.ir`
 - رمز: `admin123`
 
-## اجرای محلی (بدون Docker)
+> برای محیط واقعی، رمز ادمین پیش‌فرض و مقادیر محرمانه را تغییر بده.
 
-### Backend
+## اجرای محلی بدون Docker برای بک‌اند
+
+ابتدا PostgreSQL را اجرا کن، سپس:
+
 ```bash
 cd backend
-# نیاز به Postgres و Kafka در حال اجرا
 ./mvnw spring-boot:run
 ```
 
-### Frontend
-```bash
-cd frontend
-npm install
-npm run dev
-```
+در ویندوز می‌توانی از `mvnw.cmd spring-boot:run` استفاده کنی.
 
 ## APIهای احراز هویت
 
 - `POST /api/auth/register` - ثبت‌نام
 - `POST /api/auth/login` - ورود
 - `GET /api/auth/me` - اطلاعات کاربر فعلی (نیاز به توکن)
-
-## مرحله بعدی (کنترل پنل)
-
-در مرحله بعد می‌توان کنترل پنل ادمین، مدیریت محصولات، سفارشات، سبد خرید و ... را اضافه کرد.

@@ -1,0 +1,7 @@
+frontend
+first-teck
+test
+.git
+.idea
+**/node_modules
+**/target

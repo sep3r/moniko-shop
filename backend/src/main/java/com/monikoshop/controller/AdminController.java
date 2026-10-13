@@ -161,14 +161,8 @@ public class AdminController {
     }
 
     private String buildImageUrl(jakarta.servlet.http.HttpServletRequest request, Long productId) {
-        String base = request.getRequestURL().toString();
-        int adminIndex = base.indexOf("/api/admin/products");
-        if (adminIndex >= 0) {
-            base = base.substring(0, adminIndex);
-        }
-        // New product has no id until flush; save will assign it. The response
-        // is normalized by ProductImageController/client after persistence.
-        return base + "/api/products/" + (productId == null ? "" : productId) + "/image";
+        // مسیر نسبی ذخیره می‌شود؛ فرانت آدرس بک‌اند را (از VITE_API_URL) به آن اضافه می‌کند
+        return "/api/products/" + (productId == null ? "" : productId) + "/image";
     }
 
     // ---- Categories (hierarchical) ----
