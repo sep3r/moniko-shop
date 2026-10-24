@@ -21,7 +21,9 @@
 4. تست: `https://api.moniko.ir/api/products` باید JSON برگرداند.
 
 ## ۲) دیتابیس
-یک سرویس PostgreSQL در رانفلر بساز و آدرس داخلی/پورت را در `SPRING_DATASOURCE_URL` بگذار.
+یک سرویس PostgreSQL در رانفلر بساز. فرمت درست `SPRING_DATASOURCE_URL`:
+`jdbc:postgresql://HOST:5432/DBNAME` (با پیشوند `jdbc:` و بدون یوزر/پسورد).
+اگر رشته‌ی اتصال پنل (`postgresql://user:pass@host:5432/db`) را مستقیم بگذاری، بک‌اند آن را خودکار تبدیل می‌کند.
 
 ## ۳) فرانت (سرویس Docker جدید)
 1. در پنل پروژه → «سرویس‌ها» → «ایجاد» → Docker از گیت‌هاب.
