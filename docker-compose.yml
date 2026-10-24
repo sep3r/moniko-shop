@@ -52,6 +52,9 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        NGINX_CONF: nginx.compose.conf
+        VITE_API_URL: /api
 
     container_name: monikoshop-frontend
 

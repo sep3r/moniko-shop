@@ -64,6 +64,10 @@ public class SecurityConfig {
                 "http://localhost:3000",
                 "http://localhost:5173",
                 "http://frontend",
+                "https://moniko.ir",
+                "https://www.moniko.ir",
+                "http://moniko.ir",
+                "http://www.moniko.ir",
                 "https://moniko-shop.vercel.app",
                 "https://*.vercel.app"));
         // دامنه‌های اضافه (مثلاً دامنه اختصاصی) از متغیر محیطی، با کاما جدا شوند
