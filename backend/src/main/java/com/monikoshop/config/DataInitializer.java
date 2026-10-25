@@ -28,7 +28,7 @@ public class DataInitializer implements CommandLineRunner {
             User admin = User.builder()
                     .fullName("مدیر سیستم")
                     .email("admin@monikoshop.ir")
-                    .password(passwordEncoder.encode("admin123"))
+                    .password(passwordEncoder.encode(System.getenv().getOrDefault("ADMIN_PASSWORD", "Admin@Moniko2026!")))
                     .phone("09120000000")
                     .roles(Set.of(Role.ROLE_ADMIN, Role.ROLE_USER))
                     .enabled(true)
