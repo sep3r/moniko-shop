@@ -2,10 +2,23 @@ server:
   port: ${PORT:8080}
   # پشت پروکسی/لودبالانسر (رانفلر) تا scheme و host واقعی (https) شناسایی شود
   forward-headers-strategy: framework
+  shutdown: graceful
+  error:
+    include-message: never
+    include-stacktrace: never
+    include-binding-errors: never
+    include-exception: false
 
 spring:
   application:
     name: monikoshop-backend
+
+  # SMTP is enabled only when SPRING_MAIL_HOST (and username/password) are set as environment variables.
+  mail:
+    properties:
+      mail.smtp.connectiontimeout: 5000
+      mail.smtp.timeout: 5000
+      mail.smtp.writetimeout: 5000
 
   servlet:
     multipart:
@@ -15,7 +28,7 @@ spring:
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/monikoshop}
     username: ${SPRING_DATASOURCE_USERNAME:monikoshop}
-    password: ${SPRING_DATASOURCE_PASSWORD:monikoshop123}
+    password: ${SPRING_DATASOURCE_PASSWORD:}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -28,8 +41,9 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
 jwt:
-  secret: ${JWT_SECRET:YourSuperSecretKeyForJWTTokenGenerationMustBeLongEnough1234567890}
-  expiration: ${JWT_EXPIRATION:86400000}
+  # JWT_SECRET is required in production (>= 32 random chars). If missing, a random temporary secret is used.
+  secret: ${JWT_SECRET:}
+  expiration: ${JWT_EXPIRATION:28800000}
 
 logging:
   level:

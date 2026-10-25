@@ -1,5 +1,10 @@
 package com.monikoshop.service;
 
+
+
+import java.util.Map;
+import java.util.TreeMap;
+import com.monikoshop.exception.ApiException;
 import com.monikoshop.dto.*;
 import com.monikoshop.entity.*;
 import com.monikoshop.repository.OrderRepository;
@@ -23,10 +28,12 @@ public class OrderService {
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
 
+    private static final int MAX_QUANTITY_PER_PRODUCT = 100;
+
     private User currentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return userRepository.findByEmail(authentication.getName())
-                .orElseThrow(() -> new RuntimeException("کاربر یافت نشد"));
+                .orElseThrow(() -> new ApiException("کاربر یافت نشد"));
     }
 
     @Transactional
@@ -42,32 +49,44 @@ public class OrderService {
 
         BigDecimal total = BigDecimal.ZERO;
 
+        // Merge duplicate lines and lock products in a fixed (id) order to avoid overselling and deadlocks.
+        Map<Long, Integer> quantities = new TreeMap<>();
         for (OrderItemRequest itemRequest : request.getItems()) {
-            Product product = productRepository.findById(itemRequest.getProductId())
-                    .orElseThrow(() -> new RuntimeException("محصول با شناسه " + itemRequest.getProductId() + " یافت نشد"));
+            quantities.merge(itemRequest.getProductId(), itemRequest.getQuantity(), Integer::sum);
+        }
+
+        for (Map.Entry<Long, Integer> entry : quantities.entrySet()) {
+            Long productId = entry.getKey();
+            int quantity = entry.getValue();
+            if (quantity < 1 || quantity > MAX_QUANTITY_PER_PRODUCT) {
+                throw new ApiException("تعداد سفارش برای هر محصول باید بین ۱ و " + MAX_QUANTITY_PER_PRODUCT + " باشد");
+            }
+
+            Product product = productRepository.findByIdForUpdate(productId)
+                    .orElseThrow(() -> new ApiException("محصول با شناسه " + productId + " یافت نشد"));
 
             if (!product.isActive()) {
-                throw new RuntimeException("محصول \"" + product.getName() + "\" دیگر موجود نیست");
+                throw new ApiException("محصول \"" + product.getName() + "\" دیگر موجود نیست");
             }
-            if (product.getStock() < itemRequest.getQuantity()) {
-                throw new RuntimeException("موجودی کافی برای \"" + product.getName() + "\" وجود ندارد");
+            if (product.getStock() < quantity) {
+                throw new ApiException("موجودی کافی برای \"" + product.getName() + "\" وجود ندارد");
             }
 
             BigDecimal unitPrice = product.getDiscountPrice() != null ? product.getDiscountPrice() : product.getPrice();
-            BigDecimal subtotal = unitPrice.multiply(BigDecimal.valueOf(itemRequest.getQuantity()));
+            BigDecimal subtotal = unitPrice.multiply(BigDecimal.valueOf(quantity));
 
             OrderItem orderItem = OrderItem.builder()
                     .product(product)
                     .productName(product.getName())
                     .unitPrice(unitPrice)
-                    .quantity(itemRequest.getQuantity())
+                    .quantity(quantity)
                     .subtotal(subtotal)
                     .build();
 
             order.addItem(orderItem);
             total = total.add(subtotal);
 
-            product.setStock(product.getStock() - itemRequest.getQuantity());
+            product.setStock(product.getStock() - quantity);
             productRepository.save(product);
         }
 
@@ -88,9 +107,10 @@ public class OrderService {
     public OrderResponse getMyOrder(Long orderId) {
         User user = currentUser();
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("سفارش یافت نشد"));
+                .orElseThrow(() -> ApiException.notFound("سفارش یافت نشد"));
         if (!order.getUser().getId().equals(user.getId())) {
-            throw new RuntimeException("دسترسی به این سفارش مجاز نیست");
+            // same answer as "not found" so order ids cannot be probed
+            throw ApiException.notFound("سفارش یافت نشد");
         }
         return toResponse(order, false);
     }
@@ -104,7 +124,7 @@ public class OrderService {
     @Transactional
     public OrderResponse updateStatus(Long orderId, OrderStatus status) {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("سفارش یافت نشد"));
+                .orElseThrow(() -> new ApiException("سفارش یافت نشد"));
         order.setStatus(status);
         order = orderRepository.save(order);
         return toResponse(order, true);

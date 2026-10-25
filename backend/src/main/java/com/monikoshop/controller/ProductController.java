@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
-@CrossOrigin
 public class ProductController {
 
     private final ProductRepository productRepository;
@@ -29,6 +28,7 @@ public class ProductController {
     @GetMapping("/products/{id}")
     public ResponseEntity<Product> getProduct(@PathVariable Long id) {
         return productRepository.findById(id)
+                .filter(Product::isActive)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }

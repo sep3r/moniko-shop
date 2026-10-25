@@ -1,7 +1,7 @@
-FROM node:20-alpine AS build
+FROM node:22-alpine AS build
 WORKDIR /app
 COPY package*.json ./
-RUN npm install
+RUN npm ci
 COPY . .
 # آدرس API هنگام build داخل کد قرار می‌گیرد (پیش‌فرض: .env.production)
 ARG VITE_API_URL

@@ -1,3 +1,4 @@
+# فقط برای اجرای محلی/توسعه. مقادیر حساس را در فایل .env (کنار همین فایل) بگذار؛ نمونه: .env.example
 services:
 
   postgres:
@@ -7,11 +8,11 @@ services:
     environment:
       POSTGRES_DB: monikoshop
       POSTGRES_USER: monikoshop
-      # CHANGE THIS in production! Use a strong password and prefer secrets.
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-monikoshop123}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-me-local-only}
 
+    # فقط از خود ماشین قابل دسترسی است (نه از شبکه)
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
 
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -22,6 +23,7 @@ services:
       timeout: 5s
       retries: 5
 
+
   backend:
     build:
       context: ./backend
@@ -30,28 +32,29 @@ services:
     container_name: monikoshop-backend
 
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8080:8080"
 
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/monikoshop
       SPRING_DATASOURCE_USERNAME: monikoshop
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-monikoshop123}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-change-me-local-only}
 
-      # MUST change in production. Generate a long random string (at least 32+ chars).
-      JWT_SECRET: ${JWT_SECRET:-YourSuperSecretKeyForJWTTokenGenerationMustBeLongEnough1234567890}
-      JWT_EXPIRATION: ${JWT_EXPIRATION:-86400000}
+      # بدون JWT_SECRET یک کلید موقت تصادفی ساخته می‌شود (با هر ری‌استارت همه logout می‌شوند)
+      JWT_SECRET: ${JWT_SECRET:-}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-28800000}
 
-      # Optional: override default admin password (created only on first run)
-      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-Admin@Moniko2026!}
+      # ادمین اولیه (فقط وقتی هیچ ادمینی وجود ندارد ساخته می‌شود)
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@monikoshop.ir}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
 
-      # Optional extra CORS origins (comma-separated)
-      # CORS_ALLOWED_ORIGINS: https://yourdomain.com
+      CORS_ALLOW_LOCALHOST: "true"
 
     depends_on:
       postgres:
         condition: service_healthy
 
     restart: unless-stopped
+
 
   frontend:
     build:
@@ -70,6 +73,7 @@ services:
       - backend
 
     restart: unless-stopped
+
 
 volumes:
   postgres_data:

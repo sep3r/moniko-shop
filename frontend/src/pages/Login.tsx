@@ -17,8 +17,12 @@ export default function Login() {
     try {
       await login(email, password);
       navigate('/');
-    } catch {
-      setError('ایمیل یا رمز عبور اشتباه است');
+    } catch (err: any) {
+      setError(
+        err.response?.status === 429
+          ? err.response?.data?.message || 'تعداد تلاش‌ها بیش از حد مجاز است. چند دقیقه بعد دوباره تلاش کنید'
+          : 'ایمیل یا رمز عبور اشتباه است'
+      );
     } finally {
       setLoading(false);
     }
@@ -43,6 +47,8 @@ export default function Login() {
           </button>
         </form>
         <div className="auth-footer">
+          <Link to="/forgot-password">رمز عبور را فراموش کرده‌اید؟</Link>
+          <br />
           حساب کاربری ندارید؟ <Link to="/register">ثبت‌نام کنید</Link>
         </div>
       </div>

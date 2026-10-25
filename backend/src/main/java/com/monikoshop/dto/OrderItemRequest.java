@@ -1,5 +1,7 @@
 package com.monikoshop.dto;
 
+
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -12,5 +14,6 @@ public class OrderItemRequest {
 
     @NotNull(message = "تعداد الزامی است")
     @Min(value = 1, message = "تعداد باید حداقل ۱ باشد")
+    @Max(value = 100, message = "حداکثر تعداد برای هر محصول ۱۰۰ عدد است")
     private Integer quantity;
 }

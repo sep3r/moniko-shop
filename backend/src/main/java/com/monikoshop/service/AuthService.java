@@ -1,5 +1,7 @@
 package com.monikoshop.service;
 
+
+import com.monikoshop.exception.ApiException;
 import com.monikoshop.dto.*;
 import com.monikoshop.entity.Role;
 import com.monikoshop.entity.User;
@@ -29,13 +31,17 @@ public class AuthService {
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("این ایمیل قبلاً ثبت شده است");
+        String email = request.getEmail().trim().toLowerCase();
+        if (userRepository.existsByEmail(email)) {
+            throw new ApiException("این ایمیل قبلاً ثبت شده است");
+        }
+        if (request.getPassword().getBytes(java.nio.charset.StandardCharsets.UTF_8).length > 72) {
+            throw new ApiException("رمز عبور بیش از حد طولانی است");
         }
 
         User user = User.builder()
-                .fullName(request.getFullName())
-                .email(request.getEmail().toLowerCase())
+                .fullName(request.getFullName().trim())
+                .email(email)
                 .password(passwordEncoder.encode(request.getPassword()))
                 .phone(request.getPhone())
                 .roles(Set.of(Role.ROLE_USER))
@@ -51,7 +57,7 @@ public class AuthService {
                 .authorities("ROLE_USER")
                 .build();
 
-        String token = jwtUtil.generateToken(userDetails);
+        String token = jwtUtil.generateToken(userDetails, user.getPassword());
 
         return AuthResponse.builder()
                 .token(token)
@@ -63,9 +69,12 @@ public class AuthService {
     }
 
     public AuthResponse login(LoginRequest request) {
+        if (request.getPassword().getBytes(java.nio.charset.StandardCharsets.UTF_8).length > 72) {
+            throw new org.springframework.security.authentication.BadCredentialsException("invalid credentials");
+        }
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        request.getEmail().toLowerCase(),
+                        request.getEmail().trim().toLowerCase(),
                         request.getPassword()
                 )
         );
@@ -74,10 +83,10 @@ public class AuthService {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
         User user = userRepository.findByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("کاربر یافت نشد"));
+                .orElseThrow(() -> new ApiException("کاربر یافت نشد"));
 
 
-        String token = jwtUtil.generateToken(userDetails);
+        String token = jwtUtil.generateToken(userDetails, user.getPassword());
 
         return AuthResponse.builder()
                 .token(token)
@@ -93,7 +102,7 @@ public class AuthService {
         String email = authentication.getName();
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("کاربر یافت نشد"));
+                .orElseThrow(() -> new ApiException("کاربر یافت نشد"));
 
         return UserResponse.builder()
                 .id(user.getId())

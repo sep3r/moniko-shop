@@ -1,5 +1,7 @@
 package com.monikoshop.controller;
 
+
+import com.monikoshop.exception.ApiException;
 import com.monikoshop.entity.Product;
 import com.monikoshop.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +25,7 @@ public class ProductImageController {
     @GetMapping("/{id}/image")
     public ResponseEntity<byte[]> getProductImage(@PathVariable Long id) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("محصول یافت نشد"));
+                .orElseThrow(() -> ApiException.notFound("محصول یافت نشد"));
 
         if (product.getImageData() == null || product.getImageData().length == 0) {
             return ResponseEntity.notFound().build();
@@ -38,6 +40,7 @@ public class ProductImageController {
 
         return ResponseEntity.ok()
                 .contentType(mediaType)
+                .header("X-Content-Type-Options", "nosniff")
                 .cacheControl(CacheControl.maxAge(1, TimeUnit.HOURS).cachePublic())
                 .body(product.getImageData());
     }

@@ -1,5 +1,9 @@
 package com.monikoshop.config;
 
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import com.monikoshop.entity.*;
 import com.monikoshop.repository.CategoryRepository;
 import com.monikoshop.repository.ProductRepository;
@@ -21,19 +25,36 @@ public class DataInitializer implements CommandLineRunner {
     private final ProductRepository productRepository;
     private final PasswordEncoder passwordEncoder;
 
+    private static final Logger log = LoggerFactory.getLogger(DataInitializer.class);
+
+    @Value("${ADMIN_EMAIL:admin@monikoshop.ir}")
+    private String adminEmail;
+
+    @Value("${ADMIN_PASSWORD:}")
+    private String adminPassword;
+
     @Override
     public void run(String... args) {
-        // Create admin user if not exists
-        if (!userRepository.existsByEmail("admin@monikoshop.ir")) {
-            User admin = User.builder()
-                    .fullName("مدیر سیستم")
-                    .email("admin@monikoshop.ir")
-                    .password(passwordEncoder.encode(System.getenv().getOrDefault("ADMIN_PASSWORD", "Admin@Moniko2026!")))
-                    .phone("09120000000")
-                    .roles(Set.of(Role.ROLE_ADMIN, Role.ROLE_USER))
-                    .enabled(true)
-                    .build();
-            userRepository.save(admin);
+        // Create the first admin ONLY if no admin exists yet. The password must come from the
+        // ADMIN_PASSWORD environment variable (never hard-coded); nothing is created without it.
+        if (userRepository.countByRole(Role.ROLE_ADMIN) == 0) {
+            String email = adminEmail == null ? "" : adminEmail.trim().toLowerCase();
+            if (adminPassword == null || adminPassword.length() < 10 || email.isEmpty()) {
+                log.warn("No admin user exists. Set ADMIN_EMAIL and ADMIN_PASSWORD (min 10 chars) and restart to create one.");
+            } else if (userRepository.existsByEmail(email)) {
+                log.warn("ADMIN_EMAIL already belongs to a non-admin account; no admin was created.");
+            } else {
+                User admin = User.builder()
+                        .fullName("مدیر سیستم")
+                        .email(email)
+                        .password(passwordEncoder.encode(adminPassword))
+                        .phone("")
+                        .roles(Set.of(Role.ROLE_ADMIN, Role.ROLE_USER))
+                        .enabled(true)
+                        .build();
+                userRepository.save(admin);
+                log.info("Initial admin user created: {}", email);
+            }
         }
 
         // Seed hierarchical categories
@@ -93,7 +114,6 @@ public class DataInitializer implements CommandLineRunner {
                     .brand("BrandX")
                     .category(makeup)
                     .stock(50)
-                    .imageUrl("https://via.placeholder.com/300x300?text=Foundation")
                     .active(true)
                     .build());
 
@@ -105,7 +125,6 @@ public class DataInitializer implements CommandLineRunner {
                     .brand("SkinLab")
                     .category(skincare)
                     .stock(30)
-                    .imageUrl("https://via.placeholder.com/300x300?text=Serum")
                     .active(true)
                     .build());
 
@@ -116,7 +135,6 @@ public class DataInitializer implements CommandLineRunner {
                     .brand("HairCare")
                     .category(hair)
                     .stock(100)
-                    .imageUrl("https://via.placeholder.com/300x300?text=Shampoo")
                     .active(true)
                     .build());
 
@@ -128,7 +146,6 @@ public class DataInitializer implements CommandLineRunner {
                     .brand("Parfum")
                     .category(fragrance)
                     .stock(20)
-                    .imageUrl("https://via.placeholder.com/300x300?text=Perfume")
                     .active(true)
                     .build());
 
@@ -139,7 +156,6 @@ public class DataInitializer implements CommandLineRunner {
                     .brand("HealthPlus")
                     .category(health)
                     .stock(80)
-                    .imageUrl("https://via.placeholder.com/300x300?text=Collagen")
                     .active(true)
                     .build());
 
@@ -151,7 +167,6 @@ public class DataInitializer implements CommandLineRunner {
                     .brand("BrandX")
                     .category(makeup)
                     .stock(60)
-                    .imageUrl("https://via.placeholder.com/300x300?text=Mascara")
                     .active(true)
                     .build());
         }
@@ -161,7 +176,6 @@ public class DataInitializer implements CommandLineRunner {
         return categoryRepository.save(Category.builder()
                 .name(name)
                 .slug(slug)
-                .imageUrl("https://via.placeholder.com/200x200?text=" + slug)
                 .sortOrder(order)
                 .parent(null)
                 .build());
