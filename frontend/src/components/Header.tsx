@@ -41,6 +41,7 @@ export default function Header() {
   };
 
   return (
+    <meta name="enamad" content="52162617"/>
     <header className="header">
       <div className="header-top">
         ارسال رایگان برای سفارش‌های بالای ۵۰۰ هزار تومان

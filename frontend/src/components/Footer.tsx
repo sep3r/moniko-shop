@@ -28,8 +28,9 @@ export default function Footer() {
           <div>
             <h4>تماس با ما</h4>
             <ul>
-              <li>تلفن: 09123729632</li>
-              <li>ایمیل: info@monikoshop.ir</li>
+              <li>تلفن: 09028178300</li>
+              <li>تلفن: 09028178400</li>
+              <li>ایمیل: info@moniko.ir</li>
             </ul>
           </div>
         </div>
