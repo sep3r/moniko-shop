@@ -34,7 +34,7 @@ export default function Footer() {
               <li>
                 تلفن: <a href="tel:+989028178400" dir="ltr" style={{ unicodeBidi: 'isolate' }}>+98 902 817 8400</a>
               </li>
-              <li>ایمیل: info@monikoshop.ir</li>
+              <li>ایمیل: info@moniko.ir</li>
             </ul>
           </div>
         </div>
