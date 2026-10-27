@@ -47,7 +47,6 @@ export default function Footer() {
                                 <img
                                     referrerPolicy="origin"
                                     src="https://trustseal.enamad.ir/logo.aspx?id=8365443&Code=ClMe5Nxa0kR1zge2QEWtMOjdrj4G4shS"
-                                    alt="نماد اعتماد الکترونیکی"
                                     style={{cursor: 'pointer'}}
                                     {...({code: 'ClMe5Nxa0kR1zge2QEWtMOjdrj4G4shS'} as Record<string, string>)}
                                 />
