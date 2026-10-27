@@ -36,6 +36,13 @@ export default function Footer() {
               </li>
               <li>ایمیل: info@mail.moniko.ir</li>
             </ul>
+            <ul>
+              <li><a referrerPolicy='origin' target='_blank'
+                     href='https://trustseal.enamad.ir/?id=8365443&Code=ClMe5Nxa0kR1zge2QEWtMOjdrj4G4shS'><img
+                  referrerPolicy='origin'
+                  src='https://trustseal.enamad.ir/logo.aspx?id=8365443&Code=ClMe5Nxa0kR1zge2QEWtMOjdrj4G4shS' alt=''
+                  style='cursor:pointer' code='ClMe5Nxa0kR1zge2QEWtMOjdrj4G4shS'/></a></li>
+            </ul>
           </div>
         </div>
         <div className="footer-bottom">
