@@ -69,9 +69,21 @@ export const orderApi = {
   getById: (id: number) => api.get(`/orders/${id}`),
 };
 
+export interface AdminPage<T> {
+  items: T[];
+  page: number;
+  size: number;
+  totalItems: number;
+  totalPages: number;
+  first: boolean;
+  last: boolean;
+}
+
 export const adminApi = {
   // Products (multipart for image upload)
   getProducts: () => api.get('/admin/products'),
+  getProductsPage: (page: number, size = 20) =>
+    api.get<AdminPage<import('../types').Product>>('/admin/products/page', { params: { page, size } }),
   createProduct: (formData: FormData) =>
     api.post('/admin/products', formData),
   updateProduct: (id: number, formData: FormData) =>
@@ -104,6 +116,8 @@ export const adminApi = {
   getVisits: () => api.get('/admin/visits'),
   // Users
   getUsers: () => api.get('/admin/users'),
+  getUsersPage: (page: number, size = 20) =>
+    api.get<AdminPage<import('../types').AdminUser>>('/admin/users/page', { params: { page, size } }),
   updateUserStatus: (id: number, enabled: boolean) => api.patch(`/admin/users/${id}/status`, { enabled }),
   updateUserRoles: (id: number, roles: string[]) => api.patch(`/admin/users/${id}/roles`, { roles }),
 };

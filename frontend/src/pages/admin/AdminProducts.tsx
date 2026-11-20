@@ -3,6 +3,7 @@ import { adminApi } from '../../services/api';
 import { Category, Product } from '../../types';
 import { getProductImageUrl, FALLBACK_IMAGE } from '../../utils/imageUrl';
 import { prepareProductImage } from '../../utils/imagePrepare';
+import Pager from '../../components/Pager';
 
 const MIN_IMAGES = 1;
 const MAX_IMAGES = 5;
@@ -40,6 +41,9 @@ const emptyForm = {
 
 export default function AdminProducts() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalItems, setTotalItems] = useState(0);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -54,16 +58,18 @@ export default function AdminProducts() {
 
   const load = () => {
     setLoading(true);
-    Promise.all([adminApi.getProducts(), adminApi.getCategories()])
+    Promise.all([adminApi.getProductsPage(page, 20), adminApi.getCategories()])
       .then(([p, c]) => {
-        setProducts(p.data);
+        setProducts(p.data.items);
+        setTotalPages(p.data.totalPages);
+        setTotalItems(p.data.totalItems);
         setCategories(c.data);
       })
       .catch(() => setError('خطا در دریافت اطلاعات'))
       .finally(() => setLoading(false));
   };
 
-  useEffect(load, []);
+  useEffect(load, [page]);
 
   const revoke = (items: ImgItem[]) => {
     items.forEach((i) => { if (i.file) URL.revokeObjectURL(i.url); });
@@ -209,11 +215,13 @@ export default function AdminProducts() {
     try {
       if (form.id) {
         await adminApi.updateProduct(form.id, fd);
+        closeForm();
+        load();
       } else {
         await adminApi.createProduct(fd);
+        closeForm();
+        if (page !== 0) setPage(0); else load();
       }
-      closeForm();
-      load();
     } catch (err: any) {
       setError(err.response?.data?.message || err.response?.data?.error || 'ذخیره محصول با خطا مواجه شد');
     } finally {
@@ -225,7 +233,7 @@ export default function AdminProducts() {
     if (!confirm('حذف این محصول قطعی است؟')) return;
     try {
       await adminApi.deleteProduct(id);
-      load();
+      if (products.length === 1 && page > 0) setPage(page - 1); else load();
     } catch (err: any) {
       setError(err.response?.data?.message || 'حذف محصول با خطا مواجه شد');
     }
@@ -381,6 +389,7 @@ export default function AdminProducts() {
         </form>
       )}
 
+      <div className="admin-list-meta">{toFa(totalItems)} محصول، صفحه {toFa(page + 1)} از {toFa(Math.max(totalPages, 1))}</div>
       <table className="admin-table">
         <thead>
           <tr><th>تصویر</th><th>نام</th><th>دسته</th><th>قیمت</th><th>موجودی</th><th>وضعیت</th><th></th></tr>
@@ -407,8 +416,10 @@ export default function AdminProducts() {
               </td>
             </tr>
           ))}
+          {products.length === 0 && <tr><td colSpan={7}>محصولی ثبت نشده است.</td></tr>}
         </tbody>
       </table>
+      <Pager page={page} totalPages={totalPages} onChange={setPage} />
     </div>
   );
 }

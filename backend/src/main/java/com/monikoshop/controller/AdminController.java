@@ -14,6 +14,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -38,6 +41,15 @@ public class AdminController {
     @GetMapping("/products")
     public ResponseEntity<List<ProductResponse>> getAllProducts() {
         return ResponseEntity.ok(productService.listAll());
+    }
+
+    /** Paginated admin product listing; legacy /products remains available. */
+    @GetMapping("/products/page")
+    public ResponseEntity<AdminPage<ProductResponse>> getProductsPage(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        Pageable pageable = PageRequest.of(safePage(page), safeSize(size), Sort.by(Sort.Direction.DESC, "id"));
+        return ResponseEntity.ok(productService.listAll(pageable));
     }
 
     /**
@@ -219,6 +231,28 @@ public class AdminController {
                 .map(this::toAdminUserResponse)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(users);
+    }
+
+    /** Paginated admin user listing; legacy /users remains available. */
+    @GetMapping("/users/page")
+    public ResponseEntity<AdminPage<AdminUserResponse>> getUsersPage(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        var result = userRepository.findAll(PageRequest.of(safePage(page), safeSize(size), Sort.by(Sort.Direction.DESC, "id")));
+        List<AdminUserResponse> items = result.getContent().stream()
+                .map(this::toAdminUserResponse).toList();
+        return ResponseEntity.ok(new AdminPage<>(items, result.getNumber(), result.getSize(),
+                result.getTotalElements(), result.getTotalPages(), result.isFirst(), result.isLast()));
+    }
+
+    private static int safePage(int page) {
+        if (page < 0) throw new ApiException("شماره صفحه نامعتبر است");
+        return page;
+    }
+
+    private static int safeSize(int size) {
+        if (size < 1 || size > 100) throw new ApiException("تعداد موارد هر صفحه باید بین ۱ تا ۱۰۰ باشد");
+        return size;
     }
 
     @PatchMapping("/users/{id}/status")

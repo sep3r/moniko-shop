@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { adminApi } from '../../services/api';
 import { AdminUser } from '../../types';
+import Pager from '../../components/Pager';
 
 const formatLastLogin = (iso?: string | null) => {
   if (!iso) return 'هنوز وارد نشده';
@@ -12,15 +13,22 @@ const formatLastLogin = (iso?: string | null) => {
 
 export default function AdminUsers() {
   const [users, setUsers] = useState<AdminUser[]>([]);
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalItems, setTotalItems] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   const load = () => {
     setLoading(true);
-    adminApi.getUsers().then((res) => setUsers(res.data)).catch(() => setError('خطا در دریافت کاربران')).finally(() => setLoading(false));
+    adminApi.getUsersPage(page, 20).then((res) => {
+      setUsers(res.data.items);
+      setTotalPages(res.data.totalPages);
+      setTotalItems(res.data.totalItems);
+    }).catch(() => setError('خطا در دریافت کاربران')).finally(() => setLoading(false));
   };
 
-  useEffect(load, []);
+  useEffect(load, [page]);
 
   const toggleEnabled = async (u: AdminUser) => {
     try {
@@ -47,6 +55,7 @@ export default function AdminUsers() {
   return (
     <div>
       <h2 className="section-title">کاربران</h2>
+      <div className="admin-list-meta">{new Intl.NumberFormat('fa-IR').format(totalItems)} کاربر، صفحه {new Intl.NumberFormat('fa-IR').format(page + 1)} از {new Intl.NumberFormat('fa-IR').format(Math.max(totalPages, 1))}</div>
       {error && <div className="error-msg">{error}</div>}
       <table className="admin-table">
         <thead><tr><th>نام</th><th>ایمیل</th><th>نقش</th><th>وضعیت</th><th>آخرین ورود</th><th></th></tr></thead>
@@ -68,8 +77,10 @@ export default function AdminUsers() {
               </td>
             </tr>
           ))}
+          {users.length === 0 && <tr><td colSpan={6}>کاربری ثبت نشده است.</td></tr>}
         </tbody>
       </table>
+      <Pager page={page} totalPages={totalPages} onChange={setPage} />
     </div>
   );
 }

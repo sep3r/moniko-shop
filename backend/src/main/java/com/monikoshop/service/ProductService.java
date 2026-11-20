@@ -3,6 +3,7 @@ package com.monikoshop.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.monikoshop.dto.PagedProducts;
+import com.monikoshop.dto.AdminPage;
 import com.monikoshop.dto.ProductForm;
 import com.monikoshop.dto.ProductResponse;
 import com.monikoshop.dto.ProductSpecDto;
@@ -18,6 +19,8 @@ import com.monikoshop.repository.ProductSearchRepository;
 import com.monikoshop.search.SearchTextNormalizer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -54,6 +57,15 @@ public class ProductService {
     @Transactional(readOnly = true)
     public List<ProductResponse> listAll() {
         return toResponses(productRepository.findAll(Sort.by(Sort.Direction.DESC, "id")));
+    }
+
+    @Transactional(readOnly = true)
+    public AdminPage<ProductResponse> listAll(Pageable pageable) {
+        Pageable sorted = org.springframework.data.domain.PageRequest.of(
+                pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "id"));
+        Page<Product> result = productRepository.findAll(sorted);
+        return new AdminPage<>(toResponses(result.getContent()), result.getNumber(), result.getSize(),
+                result.getTotalElements(), result.getTotalPages(), result.isFirst(), result.isLast());
     }
 
     @Transactional(readOnly = true)
