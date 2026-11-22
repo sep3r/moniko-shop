@@ -1,4 +1,5 @@
 import { FormEvent, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
@@ -43,6 +44,21 @@ export default function Header() {
   useEffect(() => {
     setMegaOpen(false); setDrawer(false); setUserMenu(false);
   }, [location.pathname]);
+
+  // هنگام باز بودن منوی موبایل، اسکرول صفحه پشت منو قفل شود و Escape منو را ببندد.
+  useEffect(() => {
+    if (!drawer) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setDrawer(false);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [drawer]);
 
   const openMega = () => { if (closeTimer.current) clearTimeout(closeTimer.current); setMegaOpen(true); };
   const closeMega = () => { closeTimer.current = setTimeout(() => setMegaOpen(false), 150); };
@@ -148,38 +164,48 @@ export default function Header() {
       </nav>
 
       {/* منوی کشویی موبایل */}
-      {drawer && <div className="kh-overlay" onClick={() => setDrawer(false)} />}
-      <aside className={`kh-drawer ${drawer ? 'open' : ''}`} aria-hidden={!drawer}>
-        <div className="kh-drawer-head">
-          <strong>دسته‌بندی محصولات</strong>
-          <button type="button" aria-label="بستن" onClick={() => setDrawer(false)}>✕</button>
-        </div>
-        <ul>
-          {categories.map((c) => (
-            <li key={c.id}>
-              <div className="kh-drawer-row">
-                <Link to={`/categories/${c.slug}`}>{c.name}</Link>
-                {(c.children || []).length > 0 && (
-                  <button type="button" aria-label="زیرمجموعه‌ها" onClick={() => setDrawerCat(drawerCat === c.id ? null : c.id)}>
-                    {drawerCat === c.id ? '−' : '+'}
-                  </button>
-                )}
-              </div>
-              {drawerCat === c.id && (
-                <ul className="kh-drawer-sub">
-                  {sortCats(c.children || []).map((ch) => (
-                    <li key={ch.id}><Link to={`/categories/${ch.slug}`}>{ch.name}</Link></li>
-                  ))}
-                </ul>
-              )}
-            </li>
-          ))}
-        </ul>
-        <div className="kh-drawer-links">
-          {isAdmin && <Link to="/admin">پنل مدیریت</Link>}
-          <Link to="/orders">سفارش‌های من</Link>
-        </div>
-      </aside>
+      {drawer && createPortal(
+        <>
+          <div className="kh-overlay" aria-hidden="true" onClick={() => setDrawer(false)} />
+          <aside
+            className="kh-drawer open"
+            role="dialog"
+            aria-modal="true"
+            aria-label="دسته‌بندی محصولات"
+          >
+            <div className="kh-drawer-head">
+              <strong>دسته‌بندی محصولات</strong>
+              <button type="button" aria-label="بستن" onClick={() => setDrawer(false)}>✕</button>
+            </div>
+            <ul>
+              {categories.map((c) => (
+                <li key={c.id}>
+                  <div className="kh-drawer-row">
+                    <Link to={`/categories/${c.slug}`}>{c.name}</Link>
+                    {(c.children || []).length > 0 && (
+                      <button type="button" aria-label="زیرمجموعه‌ها" onClick={() => setDrawerCat(drawerCat === c.id ? null : c.id)}>
+                        {drawerCat === c.id ? '−' : '+'}
+                      </button>
+                    )}
+                  </div>
+                  {drawerCat === c.id && (
+                    <ul className="kh-drawer-sub">
+                      {sortCats(c.children || []).map((ch) => (
+                        <li key={ch.id}><Link to={`/categories/${ch.slug}`}>{ch.name}</Link></li>
+                      ))}
+                    </ul>
+                  )}
+                </li>
+              ))}
+            </ul>
+            <div className="kh-drawer-links">
+              {isAdmin && <Link to="/admin">پنل مدیریت</Link>}
+              <Link to="/orders">سفارش‌های من</Link>
+            </div>
+          </aside>
+        </>,
+        document.body
+      )}
 
       {/* نوار پایین موبایل */}
       <nav className="kh-bottom-nav" aria-label="ناوبری موبایل">

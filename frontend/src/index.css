@@ -2,11 +2,11 @@
 
 /* ==========================================================================
    مونا بیوتی — پالت: فقط همین ۴ رنگ + مشکی برای فونت‌ها
-   مرجانی #F58F83 (رنگ اصلی)  |  سبز نعنایی #D8F0E5  |  سبز مریم‌گلی #A8BFAE  |  سفید شیری #FFFCF8
+   مرجانی #F58E83 (رنگ اصلی)  |  سبز نعنایی #FBD2CA  |  سبز مریم‌گلی #EFA397  |  سفید شیری #FFFCF8
    رنگ دیگری اضافه نشود؛ بررسی خودکار: npm run check:palette
    ========================================================================== */
 :root {
-  --coral: #F58F83; --mint: #D8F0E5; --sage: #A8BFAE; --cream: #FFFCF8;
+  --coral: #F58E83; --mint: #FBD2CA; --sage: #EFA397; --cream: #FFFCF8;
   --ink: #000000; --ink-muted: rgba(0,0,0,.62);
 }
 
@@ -50,7 +50,7 @@ input, select, textarea { font-family: inherit;}
 .search-box input:focus {
   border-color: var(--coral);
   background: var(--cream);
-  box-shadow: 0 0 0 3px rgba(245,143,131,0.12);}
+  box-shadow: 0 0 0 3px rgba(245,142,131,0.12);}
 .header-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap;}
 .header-actions a, .header-actions button {
   display: flex; align-items: center; gap: 6px;
@@ -75,8 +75,8 @@ input, select, textarea { font-family: inherit;}
 .hero::before {
   content: '';
   position: absolute; inset: 0;
-  background: radial-gradient(circle at 20% 50%, rgba(245,143,131,0.08), transparent 50%),
-              radial-gradient(circle at 80% 30%, rgba(168,191,174,0.06), transparent 40%);}
+  background: radial-gradient(circle at 20% 50%, rgba(245,142,131,0.08), transparent 50%),
+              radial-gradient(circle at 80% 30%, rgba(239,163,151,0.06), transparent 40%);}
 .hero .container { position: relative;}
 .hero h1 { font-size: 30px; color: #000; margin-bottom: 12px; font-weight: 700;}
 .hero p { color: rgba(0,0,0,.62); font-size: 16px;}
@@ -103,7 +103,7 @@ input, select, textarea { font-family: inherit;}
   border: 1px solid var(--sage);}
 .category-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(245,143,131,0.12);
+  box-shadow: 0 8px 24px rgba(245,142,131,0.12);
   border-color: var(--coral);}
 .category-card img {
   width: 72px; height: 72px; object-fit: cover;
@@ -167,10 +167,10 @@ input, select, textarea { font-family: inherit;}
 .btn-primary {
   background: var(--coral);
   color: #000; width: 100%;
-  box-shadow: 0 4px 14px rgba(245,143,131,0.3);}
+  box-shadow: 0 4px 14px rgba(245,142,131,0.3);}
 .btn-primary:hover {
   background: var(--coral);
-  box-shadow: 0 6px 18px rgba(245,143,131,0.4);}
+  box-shadow: 0 6px 18px rgba(245,142,131,0.4);}
 .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; box-shadow: none;}
 .auth-footer { text-align: center; margin-top: 20px; font-size: 14px; color: rgba(0,0,0,.62);}
 .auth-footer a { color: #000; font-weight: 500;}
@@ -261,8 +261,8 @@ input, select, textarea { font-family: inherit;}
 .stat-card span { font-size: 12px; color: rgba(0,0,0,.62);}
 .stat-card.live { border-color: var(--sage); background: var(--mint);}
 .stat-card.live b { color: #000;}
-.live-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--sage); box-shadow: 0 0 0 0 rgba(245,143,131,0.6); animation: livePulse 1.6s infinite;}
-@keyframes livePulse { 70% { box-shadow: 0 0 0 8px rgba(245,143,131,0);} 100% { box-shadow: 0 0 0 0 rgba(245,143,131,0);} }
+.live-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--sage); box-shadow: 0 0 0 0 rgba(245,142,131,0.6); animation: livePulse 1.6s infinite;}
+@keyframes livePulse { 70% { box-shadow: 0 0 0 8px rgba(245,142,131,0);} 100% { box-shadow: 0 0 0 0 rgba(245,142,131,0);} }
 .visit-note { font-size: 12px; color: rgba(0,0,0,.62); margin: 10px 0 0; line-height: 1.8;}
 .visit-bar { height: 8px; background: var(--mint); border-radius: 6px; overflow: hidden;}
 .visit-bar > div { height: 100%; background: var(--coral); border-radius: 6px;}
@@ -498,3 +498,14 @@ input, select, textarea { font-family: inherit;}
 .spec-editor { display: flex; flex-direction: column; gap: 8px; align-items: flex-start;}
 .spec-row { display: grid; grid-template-columns: 1fr 2fr auto; gap: 8px; width: 100%; align-items: center;}
 @media (max-width: 640px) { .spec-row { grid-template-columns: 1fr;} }
+
+
+/* Moniko coral-first brand tokens: green tones are intentionally replaced with warm coral tints. */
+:root {
+  --coral: #F58E83;
+  --mint: #FBD2CA;
+  --sage: #EFA397;
+  --cream: #FFFCF8;
+  --ink: #171313;
+  --ink-muted: #66514E;
+}

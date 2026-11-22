@@ -35,7 +35,7 @@ export const FALLBACK_IMAGE =
     'data:image/svg+xml;charset=UTF-8,' +
     encodeURIComponent(
         '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400">' +
-        '<rect width="400" height="400" fill="#D8F0E5"/>' +
+        '<rect width="400" height="400" fill="#FBD2CA"/>' +
         '<text x="200" y="205" text-anchor="middle" ' +
         'font-family="Arial" font-size="24" fill="#000000" fill-opacity="0.6">Mona Beauty</text>' +
         '</svg>'
