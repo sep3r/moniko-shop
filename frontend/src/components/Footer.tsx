@@ -21,7 +21,7 @@ export default function Footer() {
   const email = useSetting('email', 'info@mail.moniko.ir');
   const hours = useSetting('support_hours', 'روزهای شنبه تا پنجشنبه، از ساعت ۹ الی ۲۱ پاسخگوی سوالات شما هستیم.');
   const address = useSetting('address');
-  const copyright = useSetting('copyright', '© ۱۴۰۴ مونیکو شاپ - تمامی حقوق محفوظ است');
+  const copyright = useSetting('copyright', '© ۱۴۰۴ مونا بیوتی - تمامی حقوق محفوظ است');
   const { data } = useSite();
   const socials = ['instagram', 'telegram', 'whatsapp', 'linkedin']
     .map((k) => ({ key: k, url: (data?.settings?.[k] || '').trim() }))
@@ -33,7 +33,7 @@ export default function Footer() {
       <div className="kh-container">
         <div className="kh-footer-grid">
           <div>
-            <h4>شرکت مونیکو</h4>
+            <h4>شرکت مونا بیوتی</h4>
             <ul>
               <li><Link to="/about">درباره ما</Link></li>
               <li><Link to="/contact">تماس با ما</Link></li>

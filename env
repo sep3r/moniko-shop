@@ -1,4 +1,0 @@
-POSTGRES_PASSWORD=admin_123456
-JWT_SECRET=asdfghjklqwertyuiopzxcvbnmqwertyuiasdfgh
-ADMIN_EMAIL=admin@moniko.ir
-ADMIN_PASSWORD=admin123456

@@ -36,6 +36,12 @@ build/
 .env
 .env.local
 *.env.local
+# فایلی به نام env (بدون نقطه) هم ممکن است رمزها را نگه دارد؛ هرگز کامیت نشود
+/env
+
+### Build output / dependencies ###
+node_modules/
+dist/
 
 ### Database backups ###
 backups/

@@ -1,5 +1,5 @@
 {
-  "name": "monikoshop-frontend",
+  "name": "mona-beauty-frontend",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -25,5 +25,8 @@
   },
   "engines": {
     "node": ">=20.19.0"
+  },
+  "overrides": {
+    "follow-redirects": "^1.16.2"
   }
 }

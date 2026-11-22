@@ -7,6 +7,7 @@ interface AuthContextType {
   token: string | null;
   login: (email: string, password: string) => Promise<void>;
   register: (fullName: string, email: string, password: string, phone?: string) => Promise<void>;
+  changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
   logout: () => void;
   loading: boolean;
 }
@@ -48,6 +49,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser({ id: data.id, email: data.email, fullName: data.fullName, roles: data.roles });
   };
 
+  const changePassword = async (currentPassword: string, newPassword: string) => {
+    const res = await authApi.changePassword(currentPassword, newPassword);
+    const data: AuthResponse = res.data;
+    // توکن‌های قبلی باطل شده‌اند؛ توکن تازه جایگزین می‌شود تا کاربر logout نشود
+    localStorage.setItem('token', data.token);
+    setToken(data.token);
+  };
+
   const logout = () => {
     localStorage.removeItem('token');
     setToken(null);
@@ -55,7 +64,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, register, logout, loading }}>
+    <AuthContext.Provider value={{ user, token, login, register, changePassword, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );

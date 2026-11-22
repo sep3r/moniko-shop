@@ -14,8 +14,8 @@
     <groupId>com.monikoshop</groupId>
     <artifactId>monikoshop-backend</artifactId>
     <version>1.0.0</version>
-    <name>MonikoShop Backend</name>
-    <description>MonikoShop E-commerce Backend without Kafka</description>
+    <name>Mona Beauty Backend</name>
+    <description>Mona Beauty e-commerce backend</description>
 
     <properties>
         <java.version>21</java.version>

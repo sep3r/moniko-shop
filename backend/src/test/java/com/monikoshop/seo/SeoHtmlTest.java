@@ -25,7 +25,7 @@ class SeoHtmlTest {
 
     @Test
     void pageEscapesUserContentAndHasCanonicalAndOgTags() {
-        String html = SeoHtml.page("مونیکو", "کرم <b>تست</b>", "توضیح \"ویژه\"", "https://moniko.ir/products/1",
+        String html = SeoHtml.page("مونا بیوتی", "کرم <b>تست</b>", "توضیح \"ویژه\"", "https://moniko.ir/products/1",
                 "https://api.moniko.ir/api/products/1/images/2", "product", "{\"@type\":\"Product\"}", "کرم", "<p>بدنه</p>");
         assertTrue(html.contains("<link rel=\"canonical\" href=\"https://moniko.ir/products/1\">"));
         assertTrue(html.contains("property=\"og:image\""));

@@ -37,6 +37,6 @@ export const FALLBACK_IMAGE =
         '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400">' +
         '<rect width="400" height="400" fill="#f5f5f5"/>' +
         '<text x="200" y="205" text-anchor="middle" ' +
-        'font-family="Arial" font-size="24" fill="#999">Moniko</text>' +
+        'font-family="Arial" font-size="24" fill="#5E7367">Mona Beauty</text>' +
         '</svg>'
     );

@@ -4,6 +4,8 @@ package com.monikoshop.service;
 
 import java.util.Map;
 import java.util.TreeMap;
+import com.monikoshop.audit.AuditEvent;
+import com.monikoshop.audit.AuditService;
 import com.monikoshop.exception.ApiException;
 import com.monikoshop.dto.*;
 import com.monikoshop.entity.*;
@@ -11,6 +13,7 @@ import com.monikoshop.repository.OrderRepository;
 import com.monikoshop.repository.ProductRepository;
 import com.monikoshop.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -27,8 +30,13 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
+    private final AuditService auditService;
 
     private static final int MAX_QUANTITY_PER_PRODUCT = 100;
+
+    /** سقف سفارش‌های «در انتظار» هر کاربر؛ جلوی خالی کردن موجودی با سفارش‌های پرداخت‌نشده را می‌گیرد. */
+    @Value("${ORDER_MAX_PENDING:5}")
+    private int maxPendingOrders = 5;
 
     private User currentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -39,6 +47,12 @@ public class OrderService {
     @Transactional
     public OrderResponse createOrder(OrderRequest request) {
         User user = currentUser();
+
+        if (orderRepository.countByUserIdAndStatus(user.getId(), OrderStatus.PENDING) >= maxPendingOrders) {
+            auditService.log(AuditEvent.ORDER_BLOCKED, user.getId(), user.getEmail(), "too many pending orders");
+            throw new ApiException("شما " + maxPendingOrders
+                    + " سفارش در انتظار دارید. لطفاً تا بررسی آن‌ها صبر کنید یا با پشتیبانی تماس بگیرید");
+        }
 
         Order order = Order.builder()
                 .user(user)
@@ -93,6 +107,8 @@ public class OrderService {
         order.setTotalAmount(total);
         order = orderRepository.save(order);
 
+        auditService.log(AuditEvent.ORDER_CREATED, user.getId(), user.getEmail(),
+                "orderId=" + order.getId() + ", total=" + total);
 
         return toResponse(order, false);
     }
@@ -135,6 +151,7 @@ public class OrderService {
         }
         order.setStatus(status);
         order = orderRepository.save(order);
+        auditService.log(AuditEvent.ADMIN_ORDER_STATUS, "orderId=" + orderId + ", " + previous + " -> " + status);
         return toResponse(order, true);
     }
 

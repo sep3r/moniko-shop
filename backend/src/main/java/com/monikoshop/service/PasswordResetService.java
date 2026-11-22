@@ -1,5 +1,7 @@
 package com.monikoshop.service;
 
+import com.monikoshop.audit.AuditEvent;
+import com.monikoshop.audit.AuditService;
 import com.monikoshop.entity.PasswordResetToken;
 import com.monikoshop.entity.User;
 import com.monikoshop.exception.ApiException;
@@ -31,6 +33,7 @@ public class PasswordResetService {
     private final PasswordResetTokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final MailService mailService;
+    private final AuditService auditService;
 
     private final SecureRandom secureRandom = new SecureRandom();
 
@@ -41,6 +44,7 @@ public class PasswordResetService {
     @Transactional
     public void requestReset(String email) {
         String normalized = email.trim().toLowerCase();
+        auditService.log(AuditEvent.PASSWORD_RESET_REQUESTED, null, normalized, null);
         Optional<User> found = userRepository.findByEmail(normalized);
         if (found.isEmpty() || !found.get().isEnabled()) {
             return;
@@ -93,6 +97,7 @@ public class PasswordResetService {
 
         // The token is single-use; also drop any other pending tokens of this account.
         tokenRepository.removeAllForUser(user.getId());
+        auditService.log(AuditEvent.PASSWORD_RESET_DONE, user.getId(), user.getEmail(), null);
     }
 
     private static String sha256Hex(String value) {

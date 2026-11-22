@@ -1,5 +1,6 @@
 package com.monikoshop.service;
 
+import com.monikoshop.audit.AuditService;
 import com.monikoshop.dto.OrderItemRequest;
 import com.monikoshop.dto.OrderRequest;
 import com.monikoshop.dto.OrderResponse;
@@ -38,6 +39,7 @@ import static org.mockito.Mockito.when;
 class OrderServiceTest {
 
     @Mock private OrderRepository orderRepository;
+    @Mock private AuditService auditService;
     @Mock private ProductRepository productRepository;
     @Mock private UserRepository userRepository;
     @InjectMocks private OrderService service;
@@ -119,6 +121,15 @@ class OrderServiceTest {
 
         assertThrows(ApiException.class, () -> service.createOrder(request(7, 3)));
         assertEquals(2, p.getStock());
+        verify(orderRepository, never()).save(any(Order.class));
+    }
+
+    @Test
+    void tooManyPendingOrdersAreRejectedBeforeTouchingStock() {
+        when(orderRepository.countByUserIdAndStatus(1L, OrderStatus.PENDING)).thenReturn(5L);
+
+        assertThrows(ApiException.class, () -> service.createOrder(request(7, 1)));
+        verify(productRepository, never()).findByIdForUpdate(7L);
         verify(orderRepository, never()).save(any(Order.class));
     }
 

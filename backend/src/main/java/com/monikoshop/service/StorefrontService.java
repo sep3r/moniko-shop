@@ -21,8 +21,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class StorefrontService {
 
-    private static final Set<String> IMAGE_TYPES = Set.of("image/jpeg", "image/png", "image/webp", "image/gif");
-
     /** کلیدهای مجاز تنظیمات؛ کلیدهایی که با link_ شروع می‌شوند باید آدرس https باشند. */
     public static final List<String> SETTING_KEYS = List.of(
             "topbar_text", "phone1", "phone2", "support_hours", "email", "address",
@@ -107,7 +105,7 @@ public class StorefrontService {
         b.setActive(active == null || active);
         if (image != null && !image.isEmpty()) {
             b.setData(readImage(image));
-            b.setContentType(image.getContentType());
+            b.setContentType(sniffType(b.getData()));
         }
         b.setUpdatedAt(Instant.now());
         return toDto(bannerRepository.save(b));
@@ -140,7 +138,7 @@ public class StorefrontService {
         b.setActive(active == null || active);
         if (image != null && !image.isEmpty()) {
             b.setData(readImage(image));
-            b.setContentType(image.getContentType());
+            b.setContentType(sniffType(b.getData()));
         }
         b.setUpdatedAt(Instant.now());
         return toDto(brandRepository.save(b));
@@ -208,16 +206,29 @@ public class StorefrontService {
                 b.getSortOrder(), b.isActive());
     }
 
+    /** نوع فایل از «محتوای واقعی» تشخیص داده می‌شود؛ Content-Type ارسالی کلاینت قابل اعتماد نیست. */
     private static byte[] readImage(MultipartFile f) {
-        String type = f.getContentType();
-        if (type == null || !IMAGE_TYPES.contains(type.toLowerCase())) {
-            throw bad("فقط تصویر JPG، PNG، WEBP یا GIF مجاز است");
-        }
+        byte[] bytes;
         try {
-            return f.getBytes();
+            bytes = f.getBytes();
         } catch (IOException e) {
             throw bad("خواندن فایل ممکن نشد");
         }
+        if (sniffType(bytes) == null) {
+            throw bad("فقط تصویر JPG، PNG، WEBP یا GIF مجاز است");
+        }
+        return bytes;
+    }
+
+    static String sniffType(byte[] b) {
+        String type = ProductService.detectImageType(b);
+        if (type != null) {
+            return type;
+        }
+        if (b != null && b.length >= 6 && b[0] == 'G' && b[1] == 'I' && b[2] == 'F' && b[3] == '8') {
+            return "image/gif";
+        }
+        return null;
     }
 
     private static String cleanLink(String link) {

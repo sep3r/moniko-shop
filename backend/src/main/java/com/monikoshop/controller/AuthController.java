@@ -40,6 +40,12 @@ public class AuthController {
         return ResponseEntity.ok(new MessageResponse("رمز عبور با موفقیت تغییر کرد. اکنون می‌توانید وارد شوید"));
     }
 
+    /** نیاز به ورود دارد (anyRequest().authenticated()). توکن جدید برمی‌گرداند. */
+    @PostMapping("/change-password")
+    public ResponseEntity<AuthResponse> changePassword(@Valid @RequestBody ChangePasswordRequest request) {
+        return ResponseEntity.ok(authService.changePassword(request));
+    }
+
     @GetMapping("/me")
     public ResponseEntity<UserResponse> getCurrentUser() {
         return ResponseEntity.ok(authService.getCurrentUser());

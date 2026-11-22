@@ -1,6 +1,8 @@
 package com.monikoshop.controller;
 
 
+import com.monikoshop.audit.AuditEvent;
+import com.monikoshop.audit.AuditService;
 import com.monikoshop.exception.ApiException;
 import com.monikoshop.dto.*;
 import com.monikoshop.dto.CategoryTreeResponse;
@@ -32,6 +34,7 @@ public class AdminController {
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
     private final OrderService orderService;
+    private final AuditService auditService;
 
     // ---- Products ----
 
@@ -62,7 +65,9 @@ public class AdminController {
     ) {
         ProductForm form = new ProductForm(name, subtitle, description, price, discountPrice, brand,
                 categoryId, stock, active, specs);
-        return ResponseEntity.ok(productService.create(form, images, imageOrder));
+        ProductResponse created = productService.create(form, images, imageOrder);
+        auditService.log(AuditEvent.ADMIN_PRODUCT_CREATE, "productId=" + created.id());
+        return ResponseEntity.ok(created);
     }
 
     /**
@@ -87,12 +92,15 @@ public class AdminController {
     ) {
         ProductForm form = new ProductForm(name, subtitle, description, price, discountPrice, brand,
                 categoryId, stock, active, specs);
-        return ResponseEntity.ok(productService.update(id, form, images, imageOrder));
+        ProductResponse updated = productService.update(id, form, images, imageOrder);
+        auditService.log(AuditEvent.ADMIN_PRODUCT_UPDATE, "productId=" + id);
+        return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/products/{id}")
     public ResponseEntity<MessageResponse> deleteProduct(@PathVariable Long id) {
         productService.delete(id);
+        auditService.log(AuditEvent.ADMIN_PRODUCT_DELETE, "productId=" + id);
         return ResponseEntity.ok(new MessageResponse("محصول حذف شد"));
     }
 
@@ -138,6 +146,7 @@ public class AdminController {
         }
         Category category = applyToCategory(new Category(), request, null);
         Category saved = categoryRepository.save(category);
+        auditService.log(AuditEvent.ADMIN_CATEGORY_CREATE, "categoryId=" + saved.getId());
         return ResponseEntity.ok(CategoryTreeResponse.flat(saved));
     }
 
@@ -156,6 +165,7 @@ public class AdminController {
         Category saved = categoryRepository.save(category);
         // نام/والد دسته در متن جستجوی محصولات هم هست؛ ایندکس دوباره ساخته شود
         productService.reindexAllSearchText();
+        auditService.log(AuditEvent.ADMIN_CATEGORY_UPDATE, "categoryId=" + saved.getId());
         return ResponseEntity.ok(CategoryTreeResponse.flat(saved));
     }
 
@@ -169,6 +179,7 @@ public class AdminController {
             throw new ApiException("ابتدا زیر‌دسته‌ها را حذف کنید (" + children.size() + " مورد)");
         }
         categoryRepository.delete(category);
+        auditService.log(AuditEvent.ADMIN_CATEGORY_DELETE, "categoryId=" + id);
         return ResponseEntity.ok(new MessageResponse("دسته‌بندی حذف شد"));
     }
 
@@ -229,7 +240,9 @@ public class AdminController {
             throw new ApiException("نمی‌توانید حساب کاربری خودتان را غیرفعال کنید");
         }
         user.setEnabled(request.getEnabled());
-        return ResponseEntity.ok(toAdminUserResponse(userRepository.save(user)));
+        User savedUser = userRepository.save(user);
+        auditService.log(AuditEvent.ADMIN_USER_STATUS, "userId=" + id + ", enabled=" + request.getEnabled());
+        return ResponseEntity.ok(toAdminUserResponse(savedUser));
     }
 
     @PatchMapping("/users/{id}/roles")
@@ -249,7 +262,9 @@ public class AdminController {
             throw new ApiException("نمی‌توانید دسترسی ادمین خودتان را حذف کنید");
         }
         user.setRoles(roles);
-        return ResponseEntity.ok(toAdminUserResponse(userRepository.save(user)));
+        User savedUser = userRepository.save(user);
+        auditService.log(AuditEvent.ADMIN_USER_ROLES, "userId=" + id + ", roles=" + roles);
+        return ResponseEntity.ok(toAdminUserResponse(savedUser));
     }
 
     private static String currentEmail() {

@@ -46,7 +46,7 @@ public class SeoController {
     private final ProductSearchRepository searchRepository;
     private final ObjectMapper objectMapper;
 
-    @Value("${app.site-name:مونیکو}")
+    @Value("${app.site-name:مونا بیوتی}")
     private String siteName;
     @Value("${app.site-description:فروشگاه اینترنتی لوازم آرایشی و بهداشتی}")
     private String siteDescription;

@@ -51,7 +51,7 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
 app:
-  site-name: ${SITE_NAME:مونیکو}
+  site-name: ${SITE_NAME:مونا بیوتی}
   site-description: ${SITE_DESCRIPTION:فروشگاه اینترنتی لوازم آرایشی و بهداشتی؛ خرید آنلاین با ضمانت اصالت کالا و ارسال سریع}
   # آدرس عمومی فرانت‌اند و API (برای sitemap، canonical و تصاویر در صفحات سئو)
   site-url: ${SITE_URL:${APP_BASE_URL:https://moniko.ir}}

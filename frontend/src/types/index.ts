@@ -149,3 +149,34 @@ export interface HomeProductItem {
   productName: string;
   endsAt?: string | null;
 }
+
+export interface LogPage<T> {
+  items: T[];
+  page: number;
+  size: number;
+  totalItems: number;
+  totalPages: number;
+}
+
+export interface VisitLogEntry {
+  id: number;
+  date: string;
+  visitorId: string;
+  userId: number | null;
+  userEmail: string | null;
+  ip: string;
+  userAgent: string | null;
+  firstSeen: string;
+  lastSeen: string;
+}
+
+export interface SecurityEventEntry {
+  id: number;
+  createdAt: string;
+  type: string;
+  userId: number | null;
+  email: string | null;
+  ip: string | null;
+  userAgent: string | null;
+  details: string | null;
+}

@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import ChangePasswordForm from '../components/ChangePasswordForm';
 
 export default function Profile() {
   const { user } = useAuth();
@@ -14,6 +15,7 @@ export default function Profile() {
         {user.phone && <p><strong>تلفن:</strong> {user.phone}</p>}
         <p><strong>نقش:</strong> {user.roles.includes('ROLE_ADMIN') ? 'مدیر' : 'کاربر'}</p>
       </div>
+      <ChangePasswordForm />
       <p style={{ marginTop: 20 }}><Link to="/orders">مشاهده سفارش‌های من</Link></p>
     </div>
   );

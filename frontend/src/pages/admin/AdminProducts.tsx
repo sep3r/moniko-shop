@@ -393,7 +393,7 @@ export default function AdminProducts() {
                   src={p.imageUrl ? getProductImageUrl(p.imageUrl) : FALLBACK_IMAGE}
                   alt=""
                   onError={(e) => { e.currentTarget.src = FALLBACK_IMAGE; }}
-                  style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 6, background: '#f5f5f5' }}
+                  style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 6, background: '#EDF4EF' }}
                 />
               </td>
               <td>{p.name}</td>

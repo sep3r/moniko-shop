@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Product } from '../types';
 
-export const SITE_NAME = 'مونیکو';
+export const SITE_NAME = 'مونا بیوتی';
 /** آدرس اصلی سایت (برای canonical)؛ در صورت نیاز با VITE_SITE_URL تغییر دهید. */
 export const SITE_URL = ((import.meta.env.VITE_SITE_URL as string | undefined) || 'https://moniko.ir').replace(/\/$/, '');
 export const DEFAULT_TITLE = `${SITE_NAME} | فروشگاه اینترنتی لوازم آرایشی و بهداشتی`;

@@ -11,6 +11,7 @@ export default function AdminLayout() {
           <NavLink to="/admin/orders" className={({ isActive }) => (isActive ? 'active' : '')}>سفارش‌ها</NavLink>
           <NavLink to="/admin/users" className={({ isActive }) => (isActive ? 'active' : '')}>کاربران</NavLink>
           <NavLink to="/admin/visits" className={({ isActive }) => (isActive ? 'active' : '')}>آمار بازدید</NavLink>
+          <NavLink to="/admin/logs" className={({ isActive }) => (isActive ? 'active' : '')}>لاگ و IP ها</NavLink>
           <div className="admin-nav-sep">ظاهر سایت</div>
           <NavLink to="/admin/banners" className={({ isActive }) => (isActive ? 'active' : '')}>بنرها و اسلایدر</NavLink>
           <NavLink to="/admin/home-products" className={({ isActive }) => (isActive ? 'active' : '')}>حراج روزانه و منتخب</NavLink>

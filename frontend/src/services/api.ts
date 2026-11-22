@@ -30,6 +30,8 @@ export const authApi = {
   login: (data: { email: string; password: string }) =>
     api.post('/auth/login', data),
   me: () => api.get('/auth/me'),
+  changePassword: (currentPassword: string, newPassword: string) =>
+    api.post('/auth/change-password', { currentPassword, newPassword }),
   forgotPassword: (email: string) => api.post('/auth/forgot-password', { email }),
   resetPassword: (token: string, newPassword: string) =>
     api.post('/auth/reset-password', { token, newPassword }),
@@ -102,6 +104,11 @@ export const adminApi = {
     api.put(`/admin/home-products/${type}`, { items }),
   // Visits
   getVisits: () => api.get('/admin/visits'),
+  // Logs (IP بازدیدکنندگان و رویدادهای امنیتی)
+  getVisitLogs: (params: { page?: number; size?: number; kind?: string; ip?: string; date?: string }) =>
+    api.get('/admin/logs/visits', { params }),
+  getSecurityLogs: (params: { page?: number; size?: number; type?: string; q?: string }) =>
+    api.get('/admin/logs/security', { params }),
   // Users
   getUsers: () => api.get('/admin/users'),
   updateUserStatus: (id: number, enabled: boolean) => api.patch(`/admin/users/${id}/status`, { enabled }),

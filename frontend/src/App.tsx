@@ -24,6 +24,7 @@ import AdminCategories from './pages/admin/AdminCategories';
 import AdminOrders from './pages/admin/AdminOrders';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminVisits from './pages/admin/AdminVisits';
+import AdminLogs from './pages/admin/AdminLogs';
 import AdminBanners from './pages/admin/AdminBanners';
 import AdminBrands from './pages/admin/AdminBrands';
 import AdminHomeProducts from './pages/admin/AdminHomeProducts';
@@ -63,6 +64,7 @@ export default function App() {
                         <Route path="orders" element={<AdminOrders />} />
                         <Route path="users" element={<AdminUsers />} />
                         <Route path="visits" element={<AdminVisits />} />
+                        <Route path="logs" element={<AdminLogs />} />
                         <Route path="banners" element={<AdminBanners />} />
                         <Route path="brands" element={<AdminBrands />} />
                         <Route path="home-products" element={<AdminHomeProducts />} />

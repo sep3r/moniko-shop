@@ -1,4 +1,4 @@
-# اجرای MonikoShop روی سیستم خودت با Docker
+# اجرای مونا بیوتی روی سیستم خودت با Docker
 
 ## پیش‌نیاز
 Docker Desktop (ویندوز/مک) یا Docker Engine + Compose (لینوکس) نصب و روشن باشد.

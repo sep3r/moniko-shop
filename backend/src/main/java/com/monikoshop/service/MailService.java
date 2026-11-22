@@ -54,7 +54,7 @@ public class MailService {
                     message.setFrom(from);
                 }
                 message.setTo(to);
-                message.setSubject("بازیابی رمز عبور مونیکوشاپ");
+                message.setSubject("بازیابی رمز عبور مونا بیوتی");
                 message.setText(name + " عزیز،\n\n"
                         + "درخواست بازیابی رمز عبور برای حساب شما ثبت شد. برای تعیین رمز جدید روی لینک زیر کلیک کنید:\n\n"
                         + link + "\n\n"

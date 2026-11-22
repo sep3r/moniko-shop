@@ -63,10 +63,10 @@ export default function Home() {
     },
   });
 
-  const aboutTitle = useSetting('about_title', 'خرید لوازم آرایشی و بهداشتی از فروشگاه اینترنتی مونیکو');
+  const aboutTitle = useSetting('about_title', 'خرید لوازم آرایشی و بهداشتی از فروشگاه اینترنتی مونا بیوتی');
   const aboutText = useSetting(
     'about_text',
-    'فروشگاه مونیکو با عرضه‌ی محصولات اصل و اورجینال آرایشی، بهداشتی و مراقبتی پوست و مو، امکان خرید اینترنتی امن را برای شما فراهم کرده است. ' +
+    'فروشگاه مونا بیوتی با عرضه‌ی محصولات اصل و اورجینال آرایشی، بهداشتی و مراقبتی پوست و مو، امکان خرید اینترنتی امن را برای شما فراهم کرده است. ' +
     'تمامی کالاها با تضمین اصالت و ارسال سریع به سراسر کشور عرضه می‌شوند.'
   );
   const [aboutOpen, setAboutOpen] = useState(false);
@@ -118,7 +118,7 @@ export default function Home() {
 
   const featuredTabs: Tab[] = useMemo(() => {
     const tabs: Tab[] = [];
-    if (data?.featured?.length) tabs.push({ key: 'admin', label: 'پیشنهاد مونیکو', products: data.featured });
+    if (data?.featured?.length) tabs.push({ key: 'admin', label: 'پیشنهاد مونا بیوتی', products: data.featured });
     categories.slice(0, 6).forEach((c) => {
       const ids = new Set(collectIds(c));
       tabs.push({ key: `c${c.id}`, label: c.name, products: products.filter((p) => p.category && ids.has(p.category.id)) });
@@ -201,7 +201,7 @@ export default function Home() {
 
       {mid2.length > 0 && <section className="kh-container kh-section-tight"><BannerRow banners={mid2} /></section>}
 
-      <TabbedProducts id="featured" title="منتخب مونیکو" tabs={featuredTabs} />
+      <TabbedProducts id="featured" title="منتخب مونا بیوتی" tabs={featuredTabs} />
       <TabbedProducts title="امروز چی بخریم؟" tabs={todayTabs} />
 
       {/* برندها */}

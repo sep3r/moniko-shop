@@ -63,7 +63,10 @@ export default function Header() {
       <div className="kh-container kh-header-main">
         <button type="button" className="kh-burger" aria-label="منو" onClick={() => setDrawer(true)}>☰</button>
 
-        <Link to="/" className="kh-logo">مونیکو</Link>
+        <Link to="/" className="kh-logo" aria-label="مونا بیوتی">
+          <span className="kh-logo-name">مونا بیوتی</span>
+          <span className="kh-logo-sub">BEAUTY · CARE · CONFIDENCE</span>
+        </Link>
 
         <form className="kh-search" onSubmit={onSearch} role="search">
           <input
@@ -111,7 +114,7 @@ export default function Header() {
             دسته‌بندی محصولات <span aria-hidden>▾</span>
           </button>
           <Link to="/#deals">پیشنهاد ویژه</Link>
-          <Link to="/#featured">منتخب مونیکو</Link>
+          <Link to="/#featured">منتخب مونا بیوتی</Link>
           <Link to="/#brands">برندها</Link>
         </div>
 
