@@ -36,7 +36,7 @@ export async function prepareProductImage(file: File): Promise<File> {
     canvas.height = Math.max(1, Math.round(img.naturalHeight * scale));
     const ctx = canvas.getContext('2d');
     if (ctx) {
-      ctx.fillStyle = '#ffffff'; // JPEG has no transparency
+      ctx.fillStyle = '#FFFCF8'; // JPEG has no transparency
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
       const blob: Blob | null = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.88));

@@ -99,10 +99,10 @@ export default function ResetPassword() {
                 autoComplete="new-password"
               />
               {confirmPassword.length > 0 && password !== confirmPassword && (
-                <small style={{ color: '#d32f2f' }}>رمز عبور و تکرار آن یکسان نیستند</small>
+                <small className="field-msg bad">رمز عبور و تکرار آن یکسان نیستند</small>
               )}
               {confirmPassword.length > 0 && password === confirmPassword && (
-                <small style={{ color: '#2e7d32' }}>رمزها یکسان هستند ✓</small>
+                <small className="field-msg good">رمزها یکسان هستند ✓</small>
               )}
             </div>
             <button type="submit" className="btn btn-primary" disabled={loading}>

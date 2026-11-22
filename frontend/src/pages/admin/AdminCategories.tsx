@@ -146,7 +146,7 @@ export default function AdminCategories() {
                   </option>
                 ))}
               </select>
-              <small style={{ color: '#888', fontSize: 12 }}>
+              <small style={{ color: 'rgba(0,0,0,.62)', fontSize: 12 }}>
                 اگر والد انتخاب شود، این دسته در مگامنو زیر آن نمایش داده می‌شود.
               </small>
             </div>
@@ -193,7 +193,7 @@ export default function AdminCategories() {
       <h3 style={{ margin: '24px 0 12px', fontSize: 16 }}>ساختار درختی</h3>
       <div className="category-tree">
         {tree.length === 0 && (
-          <p style={{ color: '#999' }}>هنوز دسته‌ای تعریف نشده.</p>
+          <p style={{ color: 'rgba(0,0,0,.62)' }}>هنوز دسته‌ای تعریف نشده.</p>
         )}
         {tree.map((root) => (
           <div key={root.id} className="tree-root">

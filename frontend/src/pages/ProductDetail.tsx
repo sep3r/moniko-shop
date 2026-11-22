@@ -167,9 +167,9 @@ export default function ProductDetail() {
               {loginHint && !user && (
                 <div className="error-msg" style={{ marginTop: 12 }}>
                   برای افزودن به سبد خرید ابتدا{' '}
-                  <Link to="/login" style={{ color: '#B94536', fontWeight: 600 }}>وارد شوید</Link>
+                  <Link to="/login" className="link-strong">وارد شوید</Link>
                   {' '}یا{' '}
-                  <Link to="/register" style={{ color: '#B94536', fontWeight: 600 }}>ثبت‌نام کنید</Link>.
+                  <Link to="/register" className="link-strong">ثبت‌نام کنید</Link>.
                 </div>
               )}
             </>
