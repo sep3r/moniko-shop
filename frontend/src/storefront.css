@@ -361,12 +361,13 @@ a:hover { text-decoration-color: var(--coral); }
 .kh-nav-inner > a, .kh-nav-cats { color: #000; font-weight: 600; }
 .kh-nav-inner > a:hover, .kh-nav-cats:hover, .kh-nav-cats.open { background: var(--cream); color: #000; }
 
-/* فوتر: مرجانی با متن مشکی */
-.kh-footer { background: var(--coral); color: #000; }
+/* فوتر: نعنایی (هم‌رنگ نوار بالا) با متن مشکی و جداکننده‌های مریم‌گلی */
+.kh-footer { background: var(--mint); color: #000; border-top: 1px solid var(--sage); }
 .kh-footer a:hover { text-decoration: underline; text-decoration-color: #000; }
-.kh-socials a { background: var(--cream); color: #000; }
-.kh-socials a:hover { background: var(--mint); color: #000; }
-.kh-copyright { border-top: 1px solid rgba(0,0,0,.18); }
+.kh-socials a { background: var(--cream); color: #000; box-shadow: inset 0 0 0 1px var(--sage); }
+.kh-socials a:hover { background: var(--sage); color: #000; }
+.kh-copyright { border-top: 1px solid var(--sage); color: rgba(0,0,0,.7); }
+.kh-seals img { box-shadow: inset 0 0 0 1px var(--sage); }
 
 /* هیرو پیش‌فرض: نعنایی؛ حراج روزانه: مریم‌گلی با دکمه‌ی مرجانی */
 .kh-hero-default { background: var(--mint); color: #000; border: 1px solid var(--sage); box-shadow: var(--kh-shadow-md); }
@@ -432,3 +433,18 @@ a:hover { text-decoration-color: var(--coral); }
 .remember-row { display: flex; align-items: center; gap: 10px; margin: 4px 0 16px; cursor: pointer; font-size: 14px; color: #000; user-select: none; }
 .remember-row input[type="checkbox"] { width: 18px; height: 18px; flex: 0 0 auto; accent-color: var(--coral); cursor: pointer; }
 .remember-row small { color: rgba(0,0,0,.62); font-size: 12px; }
+
+/* ===== کمی مریم‌گلی بیشتر ===== */
+.kh-title::after { background: var(--sage); }
+.kh-cat-circle { border-color: var(--sage); }
+.kh-cat:hover .kh-cat-circle { border-color: var(--coral); }
+.kh-bottom-nav a.active { background: var(--sage); }
+.kh-tabs button:hover { background: var(--sage); color: #000; }
+.kh-pager button:hover:not(.active) { background: var(--sage); }
+.admin-sidebar a:hover, .admin-sidebar nav a:hover { background: var(--sage); color: #000; }
+.kh-header-main { border-bottom: 1px solid var(--sage); }
+hr { border: 0; border-top: 1px solid var(--sage); }
+html { scrollbar-color: var(--sage) var(--cream); }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--cream); }
+::-webkit-scrollbar-thumb { background: var(--sage); border-radius: 8px; border: 2px solid var(--cream); }
