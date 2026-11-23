@@ -47,7 +47,7 @@ export default function AdminOrders() {
           {orders.map((o) => (
             <tr key={o.id}>
               <td>#{o.id}</td>
-              <td>{o.customerName}<br /><small>{o.customerEmail}</small></td>
+              <td>{o.customerName}<br /><small>{o.customerPhone || o.customerEmail}</small></td>
               <td>{new Date(o.createdAt).toLocaleDateString('fa-IR')}</td>
               <td>{formatPrice(o.totalAmount)}</td>
               <td>

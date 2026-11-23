@@ -79,7 +79,7 @@ public class AdminLogController {
         Map<Long, String> emails = new HashMap<>();
         if (!userIds.isEmpty()) {
             for (User u : userRepository.findAllById(userIds)) {
-                emails.put(u.getId(), u.getEmail());
+                emails.put(u.getId(), u.contactLabel());
             }
         }
 

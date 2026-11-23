@@ -6,6 +6,7 @@ import com.monikoshop.entity.User;
 import com.monikoshop.repository.UserRepository;
 import com.monikoshop.tracking.VisitTrackingService;
 import com.monikoshop.security.ClientIp;
+import com.monikoshop.security.CurrentUser;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,12 +25,7 @@ public class TrackController {
     /** عمومی: مرورگر هر ~۲۰ ثانیه صدا می‌زند. اگر توکن معتبر باشد کاربر، وگرنه مهمان. */
     @PostMapping("/api/track/heartbeat")
     public ResponseEntity<Void> heartbeat(@Valid @RequestBody TrackRequest request, HttpServletRequest http) {
-        Long userId = null;
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.isAuthenticated() && auth.getName() != null
-                && !"anonymousUser".equals(auth.getName())) {
-            userId = userRepository.findByEmail(auth.getName()).map(User::getId).orElse(null);
-        }
+        Long userId = CurrentUser.id();
         trackingService.heartbeat(request.visitorId().toLowerCase(), userId, ClientIp.of(http), ClientIp.userAgent(http));
         return ResponseEntity.noContent().build();
     }

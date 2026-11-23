@@ -23,7 +23,8 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 100)
+    /** اختیاری: کاربران جدید با شماره موبایل ثبت‌نام می‌کنند (ایمیل فقط برای حساب‌های قدیمی/مدیر). */
+    @Column(unique = true, length = 100)
     private String email;
 
     @Column(nullable = false)
@@ -32,8 +33,13 @@ public class User {
     @Column(nullable = false, length = 100)
     private String fullName;
 
+    /** شماره‌ی نرمال‌شده 09xxxxxxxxx؛ یکتا. */
     @Column(length = 20)
     private String phone;
+
+    /** true یعنی مالک شماره با کد پیامکی آن را تأیید کرده است. */
+    @Column(name = "phone_verified", nullable = false)
+    private boolean phoneVerified;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
@@ -56,4 +62,9 @@ public class User {
     /** آخرین زمان ورود موفق کاربر (UTC). null یعنی هنوز وارد نشده. */
     @Column(name = "last_login_at")
     private Instant lastLoginAt;
+
+    /** برچسب نمایشی برای لاگ/پنل: شماره، وگرنه ایمیل. */
+    public String contactLabel() {
+        return phone != null && !phone.isBlank() ? phone : email;
+    }
 }

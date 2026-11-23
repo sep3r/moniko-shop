@@ -11,8 +11,8 @@ export default function Profile() {
       <h2 className="section-title">پنل کاربری</h2>
       <div className="auth-card" style={{ maxWidth: 480, margin: 0 }}>
         <p><strong>نام:</strong> {user.fullName}</p>
-        <p><strong>ایمیل:</strong> {user.email}</p>
-        {user.phone && <p><strong>تلفن:</strong> {user.phone}</p>}
+        {user.phone && <p><strong>شماره موبایل:</strong> <span dir="ltr">{user.phone}</span></p>}
+        {user.email && <p><strong>ایمیل:</strong> {user.email}</p>}
         <p><strong>نقش:</strong> {user.roles.includes('ROLE_ADMIN') ? 'مدیر' : 'کاربر'}</p>
       </div>
       <ChangePasswordForm />

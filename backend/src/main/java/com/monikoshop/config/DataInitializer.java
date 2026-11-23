@@ -8,6 +8,7 @@ import com.monikoshop.entity.*;
 import com.monikoshop.repository.CategoryRepository;
 import com.monikoshop.repository.ProductRepository;
 import com.monikoshop.repository.UserRepository;
+import com.monikoshop.security.PhoneNumbers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,6 +31,10 @@ public class DataInitializer implements CommandLineRunner {
     @Value("${ADMIN_EMAIL:admin@monikoshop.ir}")
     private String adminEmail;
 
+    /** اختیاری: شماره‌ی موبایل مدیر (برای ورود با شماره و بازیابی رمز با پیامک). */
+    @Value("${ADMIN_PHONE:}")
+    private String adminPhone;
+
     @Value("${ADMIN_PASSWORD:}")
     private String adminPassword;
 
@@ -48,13 +53,28 @@ public class DataInitializer implements CommandLineRunner {
                         .fullName("مدیر سیستم")
                         .email(email)
                         .password(passwordEncoder.encode(adminPassword))
-                        .phone("")
+                        .phone(PhoneNumbers.normalize(adminPhone))
+                        .phoneVerified(PhoneNumbers.normalize(adminPhone) != null)
                         .roles(Set.of(Role.ROLE_ADMIN, Role.ROLE_USER))
                         .enabled(true)
                         .build();
                 userRepository.save(admin);
                 log.info("Initial admin user created: {}", email);
             }
+        }
+
+        // ادمین موجود بدون شماره: اگر ADMIN_PHONE تنظیم شده باشد، همان شماره روی حساب مدیر ثبت می‌شود.
+        String adminPhoneNorm = PhoneNumbers.normalize(adminPhone);
+        String adminEmailNorm = adminEmail == null ? "" : adminEmail.trim().toLowerCase();
+        if (adminPhoneNorm != null && !adminEmailNorm.isEmpty() && !userRepository.existsByPhone(adminPhoneNorm)) {
+            userRepository.findByEmail(adminEmailNorm).ifPresent(u -> {
+                if (u.getRoles().contains(Role.ROLE_ADMIN) && (u.getPhone() == null || u.getPhone().isBlank())) {
+                    u.setPhone(adminPhoneNorm);
+                    u.setPhoneVerified(true);
+                    userRepository.save(u);
+                    log.info("Admin phone set from ADMIN_PHONE");
+                }
+            });
         }
 
         // Seed hierarchical categories

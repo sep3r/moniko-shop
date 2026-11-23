@@ -1,8 +1,10 @@
 export interface User {
   id: number;
-  email: string;
+  email?: string | null;
   fullName: string;
-  phone?: string;
+  phone?: string | null;
+  /** true ⇒ تغییر رمز نیاز به کد پیامکی دارد */
+  phoneVerified?: boolean;
   roles: string[];
 }
 
@@ -10,7 +12,8 @@ export interface AuthResponse {
   token: string;
   type: string;
   id: number;
-  email: string;
+  email?: string | null;
+  phone?: string | null;
   fullName: string;
   roles: string[];
 }
@@ -91,6 +94,7 @@ export interface Order {
   items: OrderItem[];
   customerName?: string;
   customerEmail?: string;
+  customerPhone?: string;
 }
 
 export interface AdminUser {

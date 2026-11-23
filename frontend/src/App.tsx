@@ -1,13 +1,12 @@
 // @ts-ignore
 import React, { Suspense, lazy } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
-import ResetPassword from './pages/ResetPassword';
 import Category from './pages/Category';
 import ProductDetail from './pages/ProductDetail';
 import Cart from './pages/Cart';
@@ -47,7 +46,7 @@ export default function App() {
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/forgot-password" element={<ForgotPassword />} />
-                    <Route path="/reset-password" element={<ResetPassword />} />
+                    <Route path="/reset-password" element={<Navigate to="/forgot-password" replace />} />
                     <Route path="/categories/:slug" element={<Category />} />
                     <Route path="/products/:id" element={<ProductDetail />} />
                     <Route path="/cart" element={<Cart />} />

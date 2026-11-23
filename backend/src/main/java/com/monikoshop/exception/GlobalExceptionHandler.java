@@ -55,7 +55,9 @@ public class GlobalExceptionHandler {
         String message = "این عملیات با محدودیت پایگاه داده تداخل دارد";
         String detail = ex.getMostSpecificCause() != null ? ex.getMostSpecificCause().getMessage() : "";
         String lower = detail == null ? "" : detail.toLowerCase();
-        if (lower.contains("email")) {
+        if (lower.contains("phone")) {
+            message = "این شماره موبایل قبلاً ثبت شده است";
+        } else if (lower.contains("email")) {
             message = "این ایمیل قبلاً ثبت شده است";
         } else if (lower.contains("order_items") || lower.contains("products")) {
             message = "امکان حذف وجود ندارد، زیرا این مورد در سفارش‌ها یا محصولات دیگر استفاده شده است";
@@ -68,7 +70,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<MessageResponse> handleAuthentication(AuthenticationException ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(new MessageResponse("ایمیل یا رمز عبور اشتباه است"));
+                .body(new MessageResponse("شماره موبایل یا رمز عبور اشتباه است"));
     }
 
     @ExceptionHandler(AccessDeniedException.class)

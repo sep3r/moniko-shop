@@ -49,12 +49,12 @@ export default function AdminUsers() {
       <h2 className="section-title">کاربران</h2>
       {error && <div className="error-msg">{error}</div>}
       <table className="admin-table">
-        <thead><tr><th>نام</th><th>ایمیل</th><th>نقش</th><th>وضعیت</th><th>آخرین ورود</th><th></th></tr></thead>
+        <thead><tr><th>نام</th><th>شماره موبایل / ایمیل</th><th>نقش</th><th>وضعیت</th><th>آخرین ورود</th><th></th></tr></thead>
         <tbody>
           {users.map((u) => (
             <tr key={u.id}>
               <td>{u.fullName}</td>
-              <td>{u.email}</td>
+              <td dir="ltr" style={{ textAlign: 'right' }}>{u.phone || u.email}</td>
               <td>{u.roles.includes('ROLE_ADMIN') ? 'مدیر' : 'کاربر'}</td>
               <td>{u.enabled ? 'فعال' : 'غیرفعال'}</td>
               <td>{formatLastLogin(u.lastLoginAt)}</td>

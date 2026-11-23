@@ -25,6 +25,8 @@ public class RateLimitFilter extends OncePerRequestFilter {
     private static final long REGISTER_WINDOW_MS = 60 * 60 * 1000L;
     private static final long REGISTER_MAX = 20;
     private static final long FORGOT_MAX = 10;
+    /** درخواست کد پیامکی (ثبت‌نام/تغییر رمز) در ساعت برای هر IP؛ جلوی سوءاستفاده‌ی هزینه‌بر از پیامک را می‌گیرد. */
+    private static final long OTP_REQUEST_MAX = 10;
     private static final long RESET_MAX = 30;
     private static final long CHANGE_PW_MAX_FAILURES = 10;
     private static final long CATALOG_MAX_PER_MIN = 30;
@@ -132,11 +134,12 @@ public class RateLimitFilter extends OncePerRequestFilter {
         }
 
         boolean register = "/api/auth/register".equals(path);
+        boolean otpRequest = "/api/auth/register/otp".equals(path) || "/api/auth/change-password/otp".equals(path);
         boolean forgot = "/api/auth/forgot-password".equals(path);
         boolean reset = "/api/auth/reset-password".equals(path);
-        if (register || forgot || reset) {
+        if (register || forgot || reset || otpRequest) {
             String key = path + "|" + clientIp(request);
-            long max = register ? REGISTER_MAX : (forgot ? FORGOT_MAX : RESET_MAX);
+            long max = register ? REGISTER_MAX : (forgot ? FORGOT_MAX : (otpRequest ? OTP_REQUEST_MAX : RESET_MAX));
             if (isLimited(registrations, key, REGISTER_WINDOW_MS, max)) {
                 reject(response);
                 return;

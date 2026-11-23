@@ -25,4 +25,5 @@ public class OrderResponse {
     // Populated only in the admin listing, so the admin panel can show who placed the order.
     private String customerName;
     private String customerEmail;
+    private String customerPhone;
 }

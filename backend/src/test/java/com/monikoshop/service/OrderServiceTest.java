@@ -51,8 +51,8 @@ class OrderServiceTest {
         user.setEmail("user@test.com");
         user.setFullName("Test User");
         SecurityContextHolder.getContext().setAuthentication(
-                new UsernamePasswordAuthenticationToken("user@test.com", "x", List.of()));
-        lenient().when(userRepository.findByEmail("user@test.com")).thenReturn(Optional.of(user));
+                new UsernamePasswordAuthenticationToken("1", "x", List.of()));
+        lenient().when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         lenient().when(orderRepository.save(any(Order.class))).thenAnswer(inv -> inv.getArgument(0));
     }
 

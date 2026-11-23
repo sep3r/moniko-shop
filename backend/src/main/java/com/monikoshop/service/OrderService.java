@@ -7,6 +7,7 @@ import java.util.TreeMap;
 import com.monikoshop.audit.AuditEvent;
 import com.monikoshop.audit.AuditService;
 import com.monikoshop.exception.ApiException;
+import com.monikoshop.security.CurrentUser;
 import com.monikoshop.dto.*;
 import com.monikoshop.entity.*;
 import com.monikoshop.repository.OrderRepository;
@@ -39,8 +40,11 @@ public class OrderService {
     private int maxPendingOrders = 5;
 
     private User currentUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return userRepository.findByEmail(authentication.getName())
+        Long id = CurrentUser.id();
+        if (id == null) {
+            throw new ApiException("کاربر یافت نشد");
+        }
+        return userRepository.findById(id)
                 .orElseThrow(() -> new ApiException("کاربر یافت نشد"));
     }
 
@@ -49,7 +53,7 @@ public class OrderService {
         User user = currentUser();
 
         if (orderRepository.countByUserIdAndStatus(user.getId(), OrderStatus.PENDING) >= maxPendingOrders) {
-            auditService.log(AuditEvent.ORDER_BLOCKED, user.getId(), user.getEmail(), "too many pending orders");
+            auditService.log(AuditEvent.ORDER_BLOCKED, user.getId(), user.contactLabel(), "too many pending orders");
             throw new ApiException("شما " + maxPendingOrders
                     + " سفارش در انتظار دارید. لطفاً تا بررسی آن‌ها صبر کنید یا با پشتیبانی تماس بگیرید");
         }
@@ -107,7 +111,7 @@ public class OrderService {
         order.setTotalAmount(total);
         order = orderRepository.save(order);
 
-        auditService.log(AuditEvent.ORDER_CREATED, user.getId(), user.getEmail(),
+        auditService.log(AuditEvent.ORDER_CREATED, user.getId(), user.contactLabel(),
                 "orderId=" + order.getId() + ", total=" + total);
 
         return toResponse(order, false);
@@ -204,6 +208,7 @@ public class OrderService {
                 .items(items)
                 .customerName(includeCustomer ? order.getUser().getFullName() : null)
                 .customerEmail(includeCustomer ? order.getUser().getEmail() : null)
+                .customerPhone(includeCustomer ? order.getUser().getPhone() : null)
                 .build();
     }
 }

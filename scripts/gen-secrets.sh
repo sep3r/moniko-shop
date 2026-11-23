@@ -6,3 +6,4 @@ rand() { openssl rand -base64 48 | tr -d '/+=\n' | cut -c1-"$1"; }
 echo "POSTGRES_PASSWORD=$(rand 28)"
 echo "JWT_SECRET=$(rand 64)"
 echo "ADMIN_PASSWORD=$(rand 20)"
+echo "OTP_HASH_SECRET=$(rand 32)"

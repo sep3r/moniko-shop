@@ -14,6 +14,8 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
     boolean existsByEmail(String email);
+    Optional<User> findByPhone(String phone);
+    boolean existsByPhone(String phone);
 
     @Query("select count(u) from User u join u.roles r where r = :role")
     long countByRole(@Param("role") Role role);

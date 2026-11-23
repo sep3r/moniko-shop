@@ -17,6 +17,10 @@ public class ChangePasswordRequest {
     @Pattern(regexp = "^(?=.*\\p{L})(?=.*\\d).+$", message = "رمز عبور باید شامل حداقل یک حرف و یک عدد باشد")
     private String newPassword;
 
+    /** کد پیامکی (برای حساب‌هایی که شماره‌ی تأییدشده دارند الزامی است). */
+    @Pattern(regexp = "^([0-9\\u06F0-\\u06F9\\u0660-\\u0669]{6})?$", message = "کد تأیید ۶ رقمی را وارد کنید")
+    private String code;
+
     /** توکن تازه هم‌مدت با نشست فعلی صادر شود (اگر کاربر «مرا به خاطر بسپار» را زده بود). */
     private Boolean rememberMe;
 }

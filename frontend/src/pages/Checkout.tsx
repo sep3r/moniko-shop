@@ -2,14 +2,16 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { orderApi } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 
 const formatPrice = (price: number) => new Intl.NumberFormat('fa-IR').format(price) + ' تومان';
 
 export default function Checkout() {
   const { items, totalPrice, clearCart } = useCart();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [shippingAddress, setShippingAddress] = useState('');
-  const [phone, setPhone] = useState('');
+  const [phone, setPhone] = useState(user?.phone || '');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 

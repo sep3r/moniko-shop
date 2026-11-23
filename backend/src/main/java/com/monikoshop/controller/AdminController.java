@@ -236,7 +236,7 @@ public class AdminController {
     public ResponseEntity<AdminUserResponse> updateUserStatus(@PathVariable Long id, @Valid @RequestBody UpdateUserStatusRequest request) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ApiException("کاربر یافت نشد"));
-        if (Boolean.FALSE.equals(request.getEnabled()) && user.getEmail().equalsIgnoreCase(currentEmail())) {
+        if (Boolean.FALSE.equals(request.getEnabled()) && user.getId().equals(currentUserId())) {
             throw new ApiException("نمی‌توانید حساب کاربری خودتان را غیرفعال کنید");
         }
         user.setEnabled(request.getEnabled());
@@ -258,7 +258,7 @@ public class AdminController {
                 throw new ApiException("نقش نامعتبر است");
             }
         }
-        if (!roles.contains(com.monikoshop.entity.Role.ROLE_ADMIN) && user.getEmail().equalsIgnoreCase(currentEmail())) {
+        if (!roles.contains(com.monikoshop.entity.Role.ROLE_ADMIN) && user.getId().equals(currentUserId())) {
             throw new ApiException("نمی‌توانید دسترسی ادمین خودتان را حذف کنید");
         }
         user.setRoles(roles);
@@ -267,10 +267,8 @@ public class AdminController {
         return ResponseEntity.ok(toAdminUserResponse(savedUser));
     }
 
-    private static String currentEmail() {
-        org.springframework.security.core.Authentication auth =
-                org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
-        return auth == null ? "" : auth.getName();
+    private static Long currentUserId() {
+        return com.monikoshop.security.CurrentUser.id();
     }
 
     private AdminUserResponse toAdminUserResponse(User user) {

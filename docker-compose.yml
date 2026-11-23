@@ -46,6 +46,13 @@ services:
       # ادمین اولیه (فقط وقتی هیچ ادمینی وجود ندارد ساخته می‌شود)
       ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@monikoshop.ir}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      ADMIN_PHONE: ${ADMIN_PHONE:-}
+
+      # کد پیامکی (کاوه‌نگار). برای تست محلی بدون پنل: KAVENEGAR_DEV_LOG_CODES=true تا کد در لاگ backend چاپ شود
+      KAVENEGAR_API_KEY: ${KAVENEGAR_API_KEY:-}
+      KAVENEGAR_TEMPLATE: ${KAVENEGAR_TEMPLATE:-}
+      KAVENEGAR_DEV_LOG_CODES: ${KAVENEGAR_DEV_LOG_CODES:-false}
+      OTP_HASH_SECRET: ${OTP_HASH_SECRET:-}
 
       CORS_ALLOW_LOCALHOST: "true"
 

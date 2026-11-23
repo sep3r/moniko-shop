@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 export default function Login() {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [remember, setRemember] = useState(false);
   const [error, setError] = useState('');
@@ -16,13 +16,13 @@ export default function Login() {
     setError('');
     setLoading(true);
     try {
-      await login(email, password, remember);
+      await login(username.trim(), password, remember);
       navigate('/');
     } catch (err: any) {
       setError(
         err.response?.status === 429
           ? err.response?.data?.message || 'تعداد تلاش‌ها بیش از حد مجاز است. چند دقیقه بعد دوباره تلاش کنید'
-          : 'ایمیل یا رمز عبور اشتباه است'
+          : 'شماره موبایل یا رمز عبور اشتباه است'
       );
     } finally {
       setLoading(false);
@@ -36,8 +36,8 @@ export default function Login() {
         {error && <div className="error-msg">{error}</div>}
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>ایمیل</label>
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="example@email.com" />
+            <label>شماره موبایل</label>
+            <input type="text" inputMode="text" dir="ltr" value={username} onChange={(e) => setUsername(e.target.value)} required placeholder="09123456789" autoComplete="username" style={{ textAlign: 'right' }} />
           </div>
           <div className="form-group">
             <label>رمز عبور</label>

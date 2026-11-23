@@ -5,6 +5,7 @@ import com.monikoshop.entity.User;
 import com.monikoshop.repository.SecurityEventRepository;
 import com.monikoshop.repository.UserRepository;
 import com.monikoshop.security.ClientIp;
+import com.monikoshop.security.CurrentUser;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,19 +51,16 @@ public class AuditService {
 
     /** رویداد با کاربر واردشده‌ی فعلی (برای اقدام‌های مدیر و کاربر). */
     public void log(String type, String details) {
-        String email = null;
-        Long userId = null;
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.isAuthenticated() && auth.getName() != null
-                && !"anonymousUser".equals(auth.getName())) {
-            email = auth.getName();
+        String label = null;
+        Long userId = CurrentUser.id();
+        if (userId != null) {
             try {
-                userId = userRepository.findByEmail(email).map(User::getId).orElse(null);
+                label = userRepository.findById(userId).map(User::contactLabel).orElse(null);
             } catch (Exception ignored) {
                 // لاگ نباید مانع کار اصلی شود
             }
         }
-        log(type, userId, email, details);
+        log(type, userId, label, details);
     }
 
     /** رویداد با ایمیل/کاربر مشخص (مثلاً ایمیلی که در ورود ناموفق وارد شده). */

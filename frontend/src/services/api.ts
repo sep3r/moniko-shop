@@ -1,5 +1,11 @@
 import axios from 'axios';
 
+export interface OtpSent {
+  message: string;
+  expiresInSeconds: number;
+  resendAfterSeconds: number;
+}
+
 // Relative by default: nginx (prod) and the Vite dev server (see vite.config.ts)
 // both proxy /api/* to the backend, so this works regardless of host/domain.
 // Set VITE_API_URL only if the API is served from a different origin.
@@ -25,16 +31,20 @@ api.interceptors.request.use((config) => {
 });
 
 export const authApi = {
-  register: (data: { fullName: string; email: string; password: string; phone?: string; rememberMe?: boolean }) =>
+  /** ثبت‌نام مرحله‌ی ۱: ارسال کد پیامکی */
+  registerOtp: (phone: string) => api.post<OtpSent>('/auth/register/otp', { phone }),
+  /** ثبت‌نام مرحله‌ی ۲: کد + مشخصات */
+  register: (data: { fullName: string; phone: string; code: string; password: string; rememberMe?: boolean }) =>
     api.post('/auth/register', data),
-  login: (data: { email: string; password: string; rememberMe?: boolean }) =>
+  login: (data: { username: string; password: string; rememberMe?: boolean }) =>
     api.post('/auth/login', data),
   me: () => api.get('/auth/me'),
-  changePassword: (currentPassword: string, newPassword: string, rememberMe?: boolean) =>
-    api.post('/auth/change-password', { currentPassword, newPassword, rememberMe }),
-  forgotPassword: (email: string) => api.post('/auth/forgot-password', { email }),
-  resetPassword: (token: string, newPassword: string) =>
-    api.post('/auth/reset-password', { token, newPassword }),
+  changePasswordOtp: () => api.post<OtpSent>('/auth/change-password/otp'),
+  changePassword: (currentPassword: string, newPassword: string, code?: string, rememberMe?: boolean) =>
+    api.post('/auth/change-password', { currentPassword, newPassword, code: code || undefined, rememberMe }),
+  forgotPassword: (phone: string) => api.post<OtpSent>('/auth/forgot-password', { phone }),
+  resetPassword: (phone: string, code: string, newPassword: string) =>
+    api.post('/auth/reset-password', { phone, code, newPassword }),
 };
 
 export interface ProductSearchParams {
