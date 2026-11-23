@@ -8,6 +8,7 @@ export default function Register() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [phone, setPhone] = useState('');
+  const [remember, setRemember] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();
@@ -26,7 +27,7 @@ export default function Register() {
     }
     setLoading(true);
     try {
-      await register(fullName, email, password, phone || undefined);
+      await register(fullName, email, password, phone || undefined, remember);
       navigate('/');
     } catch (err: any) {
       setError(err.response?.data?.message || 'خطا در ثبت‌نام');
@@ -67,6 +68,10 @@ export default function Register() {
               <small className="field-msg good">رمزها یکسان هستند ✓</small>
             )}
           </div>
+          <label className="remember-row">
+            <input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} />
+            <span>مرا به خاطر بسپار <small>(۳ روز نیازی به ورود دوباره نیست)</small></span>
+          </label>
           <button type="submit" className="btn btn-primary" disabled={loading}>
             {loading ? 'در حال ثبت‌نام...' : 'ثبت‌نام'}
           </button>

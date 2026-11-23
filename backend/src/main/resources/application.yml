@@ -67,6 +67,8 @@ jwt:
   # JWT_SECRET is required in production (>= 32 random chars). If missing, a random temporary secret is used.
   secret: ${JWT_SECRET:}
   expiration: ${JWT_EXPIRATION:28800000}
+  # مدت توکن وقتی کاربر «مرا به خاطر بسپار» را می‌زند (پیش‌فرض ۳ روز)
+  remember-expiration: ${JWT_REMEMBER_EXPIRATION:259200000}
 
 logging:
   level:

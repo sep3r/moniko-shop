@@ -57,6 +57,11 @@ public class SeoController {
     @Value("${app.price-to-rial:10}")
     private long priceToRial;
 
+    /** تصویر پیش‌فرض اشتراک‌گذاری (تلگرام، واتس‌اپ، ...) برای صفحاتی که تصویر خودشان را ندارند. */
+    private String defaultShareImage() {
+        return siteUrl + "/og-default.png";
+    }
+
     // ------------------------------------------------------------------ pages
 
     @GetMapping("/seo/home")
@@ -73,7 +78,7 @@ public class SeoController {
         body.append(SeoHtml.linkList(links));
         body.append("\n<h2>جدیدترین محصولات</h2>\n").append(productLinks(productService.search(null, null, false, "new", 0, LIST_SIZE)));
         String html = SeoHtml.page(siteName, siteName + " | " + shorten(siteDescription, 60), siteDescription,
-                siteUrl + "/", null, "website", websiteJsonLd(), siteName, body.toString());
+                siteUrl + "/", defaultShareImage(), "website", homeJsonLd(), siteName, body.toString());
         return ok(html, HTML_UTF8);
     }
 
@@ -85,8 +90,15 @@ public class SeoController {
             String description = "خرید اینترنتی " + cat.getName() + " با بهترین قیمت و ضمانت اصالت کالا از " + siteName
                     + " (" + page.totalItems() + " کالا)";
             String body = productLinks(page);
-            String html = SeoHtml.page(siteName, title, description, siteUrl + "/categories/" + seg(cat.getSlug()),
-                    null, "website", null, cat.getName(), body);
+            String canonical = siteUrl + "/categories/" + seg(cat.getSlug());
+            Map<String, Object> collection = new LinkedHashMap<>();
+            collection.put("@type", "CollectionPage");
+            collection.put("name", cat.getName());
+            collection.put("url", canonical);
+            String jsonLd = graph(List.of(collection,
+                    breadcrumbList(new String[]{siteName, siteUrl + "/"}, new String[]{cat.getName(), canonical})));
+            String html = SeoHtml.page(siteName, title, description, canonical,
+                    defaultShareImage(), "website", jsonLd, cat.getName(), body);
             return ok(html, HTML_UTF8);
         }).orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -96,11 +108,17 @@ public class SeoController {
         return productService.findActive(id).map(p -> {
             String canonical = siteUrl + "/products/" + p.id();
             String image = absoluteImage(p.imageUrl());
+            String shareImage = image != null ? image : defaultShareImage();
             String catName = p.category() == null ? "" : p.category().name();
             String title = p.name() + (catName.isEmpty() ? "" : " | " + catName) + " | " + siteName;
             String description = descriptionOf(p);
 
             StringBuilder body = new StringBuilder();
+            if (image != null) {
+                // تصویر اصلی با alt توصیفی (برای ایندکس تصاویر)
+                body.append("<p><img src=\"").append(SeoHtml.esc(image)).append("\" alt=\"")
+                        .append(SeoHtml.esc(p.name())).append("\"></p>\n");
+            }
             if (p.subtitle() != null && !p.subtitle().isBlank()) {
                 body.append("<p>").append(SeoHtml.esc(p.subtitle())).append("</p>\n");
             }
@@ -122,8 +140,15 @@ public class SeoController {
                 body.append("<p><a href=\"").append(SeoHtml.esc(siteUrl + "/categories/" + seg(p.category().slug())))
                         .append("\">").append(SeoHtml.esc(catName)).append("</a></p>");
             }
-            String html = SeoHtml.page(siteName, title, description, canonical, image, "product",
-                    productJsonLd(p, canonical), p.name(), body.toString());
+            List<String[]> crumbs = new ArrayList<>();
+            crumbs.add(new String[]{siteName, siteUrl + "/"});
+            if (p.category() != null) {
+                crumbs.add(new String[]{catName, siteUrl + "/categories/" + seg(p.category().slug())});
+            }
+            crumbs.add(new String[]{p.name(), canonical});
+            String jsonLd = graph(List.of(productNode(p, canonical), breadcrumbList(crumbs.toArray(new String[0][]))));
+            String html = SeoHtml.page(siteName, title, description, canonical, shareImage, "product",
+                    jsonLd, p.name(), body.toString());
             return ok(html, HTML_UTF8);
         }).orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -190,23 +215,53 @@ public class SeoController {
         return s.length() <= max ? s : s.substring(0, max - 1).trim() + "…";
     }
 
-    private String websiteJsonLd() {
-        Map<String, Object> m = new LinkedHashMap<>();
-        m.put("@context", "https://schema.org");
-        m.put("@type", "WebSite");
-        m.put("name", siteName);
-        m.put("url", siteUrl + "/");
+    private String homeJsonLd() {
+        Map<String, Object> site = new LinkedHashMap<>();
+        site.put("@type", "WebSite");
+        site.put("name", siteName);
+        site.put("url", siteUrl + "/");
         Map<String, Object> action = new LinkedHashMap<>();
         action.put("@type", "SearchAction");
         action.put("target", siteUrl + "/search?q={search_term_string}");
         action.put("query-input", "required name=search_term_string");
-        m.put("potentialAction", action);
-        return json(m);
+        site.put("potentialAction", action);
+
+        Map<String, Object> org = new LinkedHashMap<>();
+        org.put("@type", "Organization");
+        org.put("name", siteName);
+        org.put("url", siteUrl + "/");
+        org.put("logo", siteUrl + "/og-default.png");
+        return graph(List.of(site, org));
     }
 
-    private String productJsonLd(ProductResponse p, String canonical) {
+    /** نقش «مسیر صفحه» (BreadcrumbList) برای نمایش در نتایج گوگل. هر عنصر: {نام، آدرس}. */
+    private static Map<String, Object> breadcrumbList(String[]... crumbs) {
+        List<Map<String, Object>> items = new ArrayList<>();
+        int position = 1;
+        for (String[] c : crumbs) {
+            Map<String, Object> item = new LinkedHashMap<>();
+            item.put("@type", "ListItem");
+            item.put("position", position++);
+            item.put("name", c[0]);
+            item.put("item", c[1]);
+            items.add(item);
+        }
+        Map<String, Object> list = new LinkedHashMap<>();
+        list.put("@type", "BreadcrumbList");
+        list.put("itemListElement", items);
+        return list;
+    }
+
+    /** چند گره‌ی schema.org را در یک JSON-LD با @graph می‌گذارد. */
+    private String graph(List<Map<String, Object>> nodes) {
+        Map<String, Object> root = new LinkedHashMap<>();
+        root.put("@context", "https://schema.org");
+        root.put("@graph", nodes);
+        return json(root);
+    }
+
+    private Map<String, Object> productNode(ProductResponse p, String canonical) {
         Map<String, Object> m = new LinkedHashMap<>();
-        m.put("@context", "https://schema.org");
         m.put("@type", "Product");
         m.put("name", p.name());
         m.put("sku", String.valueOf(p.id()));
@@ -236,8 +291,13 @@ public class SeoController {
         offer.put("price", effectivePrice(p).multiply(BigDecimal.valueOf(priceToRial)).toPlainString());
         offer.put("availability", p.stock() != null && p.stock() > 0
                 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock");
+        offer.put("itemCondition", "https://schema.org/NewCondition");
+        Map<String, Object> seller = new LinkedHashMap<>();
+        seller.put("@type", "Organization");
+        seller.put("name", siteName);
+        offer.put("seller", seller);
         m.put("offers", offer);
-        return json(m);
+        return m;
     }
 
     private String json(Map<String, Object> m) {

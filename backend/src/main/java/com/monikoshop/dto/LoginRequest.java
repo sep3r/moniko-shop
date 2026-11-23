@@ -17,4 +17,7 @@ public class LoginRequest {
     @NotBlank(message = "رمز عبور الزامی است")
     @Size(max = 128)
     private String password;
+
+    /** «مرا به خاطر بسپار»: توکن ۳ روزه (JWT_REMEMBER_EXPIRATION) به‌جای توکن کوتاه‌مدت. اختیاری. */
+    private Boolean rememberMe;
 }

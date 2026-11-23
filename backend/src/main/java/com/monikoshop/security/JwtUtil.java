@@ -36,6 +36,10 @@ public class JwtUtil {
     @Value("${jwt.expiration:28800000}")
     private long expiration;
 
+    /** مدت توکن وقتی کاربر «مرا به خاطر بسپار» را زده؛ پیش‌فرض ۳ روز. */
+    @Value("${jwt.remember-expiration:259200000}")
+    private long rememberExpiration;
+
     private SecretKey signingKey;
 
     @PostConstruct
@@ -83,9 +87,14 @@ public class JwtUtil {
 
     /** The token is bound to the current password hash, so changing/resetting the password invalidates old tokens. */
     public String generateToken(UserDetails userDetails, String passwordHash) {
+        return generateToken(userDetails, passwordHash, false);
+    }
+
+    /** @param remember true ⇒ توکن بلندمدت (۳ روز)؛ false ⇒ توکن عادی (۸ ساعت) */
+    public String generateToken(UserDetails userDetails, String passwordHash, boolean remember) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("pv", fingerprint(passwordHash));
-        return createToken(claims, userDetails.getUsername());
+        return createToken(claims, userDetails.getUsername(), remember ? rememberExpiration : expiration);
     }
 
     private static String fingerprint(String passwordHash) {
@@ -101,12 +110,12 @@ public class JwtUtil {
         }
     }
 
-    private String createToken(Map<String, Object> claims, String subject) {
+    private String createToken(Map<String, Object> claims, String subject, long ttlMillis) {
         return Jwts.builder()
                 .claims(claims)
                 .subject(subject)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + expiration))
+                .expiration(new Date(System.currentTimeMillis() + ttlMillis))
                 .signWith(getSigningKey())
                 .compact();
     }

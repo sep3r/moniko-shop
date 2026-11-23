@@ -1,6 +1,6 @@
 /* ============================================================
    ظاهر فروشگاه (الهام‌گرفته از چیدمان خانومی) — پیشوند kh-
-   رنگ اصلی مرجانی #F58E83؛ فقط ۴ رنگ پالت + مشکی برای فونت
+   رنگ اصلی مرجانی #F58F83؛ فقط ۴ رنگ پالت + مشکی برای فونت
    ============================================================ */
 
 body { color: #000; background: var(--cream);}
@@ -28,7 +28,7 @@ body { color: #000; background: var(--cream);}
 .kh-search input {
   width: 100%; height: 42px; border: 1px solid var(--sage); border-radius: 10px; background: var(--cream);
   padding: 0 16px 0 46px; font-size: 14px; outline: none; transition: border-color .15s, box-shadow .15s;}
-.kh-search input:focus { border-color: var(--coral); box-shadow: 0 0 0 3px rgba(245,142,131,0.12);}
+.kh-search input:focus { border-color: var(--coral); box-shadow: 0 0 0 3px rgba(245,143,131,0.12);}
 .kh-search button { position: absolute; left: 6px; top: 50%; transform: translateY(-50%); background: none; border: none; color: rgba(0,0,0,.62); padding: 6px; display: flex;}
 .kh-search button:hover { color: #000;}
 .kh-actions { margin-right: auto; display: flex; align-items: center; gap: 12px;}
@@ -270,8 +270,8 @@ body { color: #000; background: var(--cream);}
   --kh-radius: 14px;
   --kh-shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
   --kh-shadow-md: 0 10px 28px rgba(0,0,0,0.12);
-  --kh-shadow-coral: 0 8px 22px rgba(245,142,131,0.35);
-  --kh-ring: 0 0 0 3px rgba(245,142,131,0.38);}
+  --kh-shadow-coral: 0 8px 22px rgba(245,143,131,0.35);
+  --kh-ring: 0 0 0 3px rgba(245,143,131,0.38);}
 ::selection { background: var(--mint); color: #000;}
 html { scroll-behavior: smooth;}
 
@@ -296,7 +296,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 /* حراج روزانه و هیرو: مرجانی با متن تیره (کنتراست خوب) */
 .kh-deal { background: var(--coral); box-shadow: var(--kh-shadow-coral);}
 .kh-deal, .kh-deal-side, .kh-countdown, .kh-deal-more { color: #000;}
-.kh-deal-more { border-color: rgba(245,142,131,0.35); transition: background .15s;}
+.kh-deal-more { border-color: rgba(245,143,131,0.35); transition: background .15s;}
 .kh-deal-more:hover { background: rgba(255,252,248,0.4);}
 .kh-cd-box { box-shadow: var(--kh-shadow-sm);}
 .kh-hero-default { background: var(--coral); color: #000; box-shadow: var(--kh-shadow-coral);}
@@ -353,16 +353,32 @@ button { color: #000; }
 input[type="checkbox"], input[type="radio"], progress { accent-color: var(--coral); }
 a:hover { text-decoration-color: var(--coral); }
 
-/* نوار منو: نعنایی با هاور مرجانی */
-.kh-nav { background: var(--mint); border-bottom: 1px solid var(--sage); }
-.kh-nav-inner > a:hover, .kh-nav-cats:hover, .kh-nav-cats.open { background: var(--coral); color: #000; }
+/* نوار بالا: نعنایی */
+.kh-topbar { background: var(--mint); color: #000; border-bottom: 1px solid var(--sage); font-weight: 600; }
 
-/* فوتر: مریم‌گلی با متن مشکی */
-.kh-footer { background: var(--sage); color: #000; }
+/* نوار دسته‌بندی: مرجانی (هاور: سفید شیری) */
+.kh-nav { background: var(--coral); border-bottom: 1px solid rgba(0,0,0,.12); }
+.kh-nav-inner > a, .kh-nav-cats { color: #000; font-weight: 600; }
+.kh-nav-inner > a:hover, .kh-nav-cats:hover, .kh-nav-cats.open { background: var(--cream); color: #000; }
+
+/* فوتر: مرجانی با متن مشکی */
+.kh-footer { background: var(--coral); color: #000; }
 .kh-footer a:hover { text-decoration: underline; text-decoration-color: #000; }
 .kh-socials a { background: var(--cream); color: #000; }
-.kh-socials a:hover { background: var(--coral); color: #000; }
+.kh-socials a:hover { background: var(--mint); color: #000; }
 .kh-copyright { border-top: 1px solid rgba(0,0,0,.18); }
+
+/* هیرو پیش‌فرض: نعنایی؛ حراج روزانه: مریم‌گلی با دکمه‌ی مرجانی */
+.kh-hero-default { background: var(--mint); color: #000; border: 1px solid var(--sage); box-shadow: var(--kh-shadow-md); }
+.kh-deal { background: var(--sage); box-shadow: var(--kh-shadow-md); }
+.kh-deal, .kh-deal-side, .kh-countdown { color: #000; }
+.kh-deal-more { background: var(--coral); color: #000; border-color: transparent; }
+.kh-deal-more:hover { background: var(--cream); }
+.kh-cd-box { background: var(--cream); color: #000; }
+
+/* نوار پایین موبایل */
+.kh-bottom-nav { background: var(--cream); border-top: 1px solid var(--sage); }
+.kh-bottom-nav a.active { background: var(--mint); color: #000; font-weight: 700; }
 
 /* پیام‌ها */
 .error-msg { background: var(--cream); color: #000; border: 1.5px solid var(--coral); }
@@ -392,74 +408,27 @@ a:hover { text-decoration-color: var(--coral); }
 .log-chip.guest { background: var(--cream); box-shadow: inset 0 0 0 1px var(--sage); }
 .admin-table th { background: var(--mint); color: #000; }
 
-
-/* ============================================================
-   MONIKO CORAL-FIRST STOREFRONT OVERRIDES
-   ============================================================ */
-:root {
-  --coral: #F58E83;
-  --mint: #FBD2CA; /* pale coral surface */
-  --sage: #EFA397; /* warm coral border / secondary */
-  --cream: #FFFCF8;
-}
+/* منوی موبایل بالاتر از همه‌ی بخش‌ها و بنرها قرار می‌گیرد */
 .kh-header { z-index: 1200; }
-.kh-topbar { background: var(--coral); color: #241614; }
-.kh-logo-name { color: #75443E; }
-.kh-nav { background: var(--coral); border-bottom: 1px solid var(--sage); }
-.kh-nav-inner > a, .kh-nav-cats { color: #241614; }
-.kh-nav-inner > a:hover, .kh-nav-cats:hover, .kh-nav-cats.open { background: var(--cream); color: #75443E; }
-.kh-mega-side li.active a, .kh-mega-side li:hover a { background: var(--mint); color: #4A2925; }
-.kh-drawer-head { background: var(--coral); color: #241614; border-bottom-color: var(--sage); }
-.kh-drawer-row { border-bottom-color: var(--sage); }
-.kh-drawer-row button:hover, .kh-drawer-sub a:hover { background: var(--mint); }
-.kh-footer { background: var(--coral); color: #241614; }
-.kh-footer h4, .kh-footer p, .kh-footer li a, .kh-footer-contact, .kh-email { color: #241614; }
-.kh-footer li a:hover { color: #4A2925; }
-.kh-socials a { background: var(--cream); color: #75443E; }
-.kh-socials a:hover { background: var(--mint); color: #4A2925; }
-.kh-copyright { color: #4A2925; border-top-color: rgba(74,41,37,.25); }
-.kh-title::after { background: var(--sage); }
-.kh-cat-circle { background: var(--mint); border-color: var(--sage); }
-.kh-card, .kh-brand, .auth-card { border-color: var(--sage); }
-.kh-tabs button.active, .kh-pager button.active { background: var(--coral); border-color: var(--coral); color: #241614; }
-.kh-bottom-nav { background: var(--cream); border-top-color: var(--sage); }
-.kh-bottom-nav a.active { color: #A94F45; }
 .kh-overlay { z-index: 1201; }
 .kh-drawer { z-index: 1202; }
-
-/* Mobile menu is layered above every storefront section and banner. */
+.kh-drawer-head { background: var(--coral); color: #000; border-bottom-color: rgba(0,0,0,.12); }
+.kh-drawer-row { border-bottom-color: var(--sage); }
+.kh-drawer-row button:hover, .kh-drawer-sub a:hover { background: var(--mint); }
 @media (max-width: 900px) {
-  .kh-header {
-    position: relative;
-    z-index: 1200;
-    isolation: isolate;
-  }
-  .kh-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 1201;
-    background: rgba(25, 15, 13, .48);
-    backdrop-filter: blur(2px);
-  }
+  .kh-header { position: relative; z-index: 1200; isolation: isolate; }
+  .kh-overlay { position: fixed; inset: 0; z-index: 1201; background: rgba(0,0,0,.48); backdrop-filter: blur(2px); }
   .kh-drawer {
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 1202;
-    width: min(88vw, 380px);
-    max-width: 100%;
-    background: var(--cream);
-    box-shadow: -16px 0 40px rgba(50, 25, 20, .18);
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    -webkit-overflow-scrolling: touch;
+    position: fixed; top: 0; right: 0; bottom: 0; z-index: 1202;
+    width: min(88vw, 380px); max-width: 100%;
+    background: var(--cream); box-shadow: -16px 0 40px rgba(0,0,0,.18);
+    overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
   }
-  .kh-drawer-head {
-    position: sticky;
-    top: 0;
-    z-index: 2;
-    min-height: 64px;
-  }
+  .kh-drawer-head { position: sticky; top: 0; z-index: 2; min-height: 64px; }
   .kh-bottom-nav { z-index: 100; }
 }
+
+/* «مرا به خاطر بسپار» */
+.remember-row { display: flex; align-items: center; gap: 10px; margin: 4px 0 16px; cursor: pointer; font-size: 14px; color: #000; user-select: none; }
+.remember-row input[type="checkbox"] { width: 18px; height: 18px; flex: 0 0 auto; accent-color: var(--coral); cursor: pointer; }
+.remember-row small { color: rgba(0,0,0,.62); font-size: 12px; }

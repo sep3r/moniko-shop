@@ -21,7 +21,7 @@ export default function Cart() {
         </div>
         <div style={{ display: 'flex', gap: 12, marginTop: 16 }}>
           <Link to="/login" className="btn btn-primary" style={{ width: 'auto' }}>ورود</Link>
-          <Link to="/register" className="btn" style={{ width: 'auto', background: '#FBD2CA' }}>ثبت‌نام</Link>
+          <Link to="/register" className="btn" style={{ width: 'auto', background: '#D8F0E5' }}>ثبت‌نام</Link>
         </div>
       </div>
     );

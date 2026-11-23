@@ -16,4 +16,7 @@ public class ChangePasswordRequest {
     @Size(min = 8, max = 64, message = "رمز عبور باید ۸ تا ۶۴ کاراکتر باشد")
     @Pattern(regexp = "^(?=.*\\p{L})(?=.*\\d).+$", message = "رمز عبور باید شامل حداقل یک حرف و یک عدد باشد")
     private String newPassword;
+
+    /** توکن تازه هم‌مدت با نشست فعلی صادر شود (اگر کاربر «مرا به خاطر بسپار» را زده بود). */
+    private Boolean rememberMe;
 }

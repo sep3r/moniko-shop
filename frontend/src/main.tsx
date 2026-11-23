@@ -5,6 +5,7 @@ import App from './App'
 import { AuthProvider } from './context/AuthContext'
 import { CartProvider } from './context/CartContext'
 import { SiteProvider } from './context/SiteContext'
+import '@fontsource-variable/vazirmatn'
 import './index.css'
 import './storefront.css'
 

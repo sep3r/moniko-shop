@@ -14,6 +14,7 @@ export default function ProductCard({ product }: { product: Product }) {
           src={product.imageUrl ? getProductImageUrl(product.imageUrl) : FALLBACK_IMAGE}
           alt={product.name}
           loading="lazy"
+          decoding="async"
           onError={(e) => { e.currentTarget.src = FALLBACK_IMAGE; }}
         />
         {soldOut && <span className="kh-soldout">ناموجود</span>}

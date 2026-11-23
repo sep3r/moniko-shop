@@ -69,3 +69,11 @@ cd backend
 | سفید شیری | `#FFFCF8` | پس‌زمینه‌ی سایت و کارت‌ها |
 
 رنگ‌ها در `frontend/src/index.css` (`:root`) تعریف شده‌اند. برای اضافه نشدن رنگ دیگر: `npm run check:palette` (در CI هم اجرا می‌شود).
+
+## سئو
+
+- خزنده‌ها (گوگل، تلگرام، واتس‌اپ، ...) HTML سروری `/api/seo/*` را می‌گیرند؛ کاربران عادی اپ React را می‌بینند.
+- هر صفحه: عنوان، توضیحات، canonical، Open Graph، کارت توییتر، و داده‌ی ساختاریافته (Product، BreadcrumbList، CollectionPage، WebSite، Organization).
+- تصویر پیش‌فرض اشتراک‌گذاری: `frontend/public/og-default.png` (۱۲۰۰×۶۳۰).
+- فونت وزیرمتن داخل خود سایت است (بدون Google Fonts)؛ صفحه‌های پنل کاربر و ادمین lazy بارگذاری می‌شوند.
+- صفحه‌ی ناموجود (محصول، دسته، ۴۰۴) `noindex` می‌گیرد؛ سبد، حساب و ادمین هم `noindex` + `Disallow` هستند.

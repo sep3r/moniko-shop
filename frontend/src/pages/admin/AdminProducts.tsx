@@ -264,7 +264,7 @@ export default function AdminProducts() {
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               rows={4}
               maxLength={10000}
-              style={{ width: '100%', padding: '12px 14px', border: '1px solid #EFA397', borderRadius: 8, fontFamily: 'inherit' }}
+              style={{ width: '100%', padding: '12px 14px', border: '1px solid #A8BFAE', borderRadius: 8, fontFamily: 'inherit' }}
             />
           </div>
           <div className="admin-form-row">
@@ -393,7 +393,7 @@ export default function AdminProducts() {
                   src={p.imageUrl ? getProductImageUrl(p.imageUrl) : FALLBACK_IMAGE}
                   alt=""
                   onError={(e) => { e.currentTarget.src = FALLBACK_IMAGE; }}
-                  style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 6, background: '#FBD2CA' }}
+                  style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 6, background: '#D8F0E5' }}
                 />
               </td>
               <td>{p.name}</td>

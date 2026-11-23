@@ -1,5 +1,5 @@
 // @ts-ignore
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -11,26 +11,28 @@ import ResetPassword from './pages/ResetPassword';
 import Category from './pages/Category';
 import ProductDetail from './pages/ProductDetail';
 import Cart from './pages/Cart';
-import Checkout from './pages/Checkout';
-import Orders from './pages/Orders';
-import OrderDetail from './pages/OrderDetail';
-import Profile from './pages/Profile';
 import NotFound from './pages/NotFound';
 import Search from './pages/Search';
 import { ProtectedRoute, AdminRoute } from './components/RouteGuards';
-import AdminLayout from './pages/admin/AdminLayout';
-import AdminProducts from './pages/admin/AdminProducts';
-import AdminCategories from './pages/admin/AdminCategories';
-import AdminOrders from './pages/admin/AdminOrders';
-import AdminUsers from './pages/admin/AdminUsers';
-import AdminVisits from './pages/admin/AdminVisits';
-import AdminLogs from './pages/admin/AdminLogs';
-import AdminBanners from './pages/admin/AdminBanners';
-import AdminBrands from './pages/admin/AdminBrands';
-import AdminHomeProducts from './pages/admin/AdminHomeProducts';
-import AdminSettings from './pages/admin/AdminSettings';
 import { useVisitTracker } from './utils/visitTracker';
 import { usePrivateRouteNoindex } from './utils/seo';
+
+// صفحه‌های پنل کاربر و مدیریت فقط وقتی لازم شدند بارگذاری می‌شوند (بسته‌ی اولیه‌ی سایت سبک‌تر = سریع‌تر برای بازدیدکننده و گوگل)
+const Checkout = lazy(() => import('./pages/Checkout'));
+const Orders = lazy(() => import('./pages/Orders'));
+const OrderDetail = lazy(() => import('./pages/OrderDetail'));
+const Profile = lazy(() => import('./pages/Profile'));
+const AdminLayout = lazy(() => import('./pages/admin/AdminLayout'));
+const AdminProducts = lazy(() => import('./pages/admin/AdminProducts'));
+const AdminCategories = lazy(() => import('./pages/admin/AdminCategories'));
+const AdminOrders = lazy(() => import('./pages/admin/AdminOrders'));
+const AdminUsers = lazy(() => import('./pages/admin/AdminUsers'));
+const AdminVisits = lazy(() => import('./pages/admin/AdminVisits'));
+const AdminLogs = lazy(() => import('./pages/admin/AdminLogs'));
+const AdminBanners = lazy(() => import('./pages/admin/AdminBanners'));
+const AdminBrands = lazy(() => import('./pages/admin/AdminBrands'));
+const AdminHomeProducts = lazy(() => import('./pages/admin/AdminHomeProducts'));
+const AdminSettings = lazy(() => import('./pages/admin/AdminSettings'));
 
 export default function App() {
     useVisitTracker();
@@ -39,6 +41,7 @@ export default function App() {
         <>
             <Header />
             <main>
+                <Suspense fallback={<div className="loading">در حال بارگذاری...</div>}>
                 <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/login" element={<Login />} />
@@ -73,6 +76,7 @@ export default function App() {
 
                     <Route path="*" element={<NotFound />} />
                 </Routes>
+                </Suspense>
             </main>
             <Footer />
         </>

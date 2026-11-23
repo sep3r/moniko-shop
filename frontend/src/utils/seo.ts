@@ -6,6 +6,8 @@ export const SITE_NAME = 'مونا بیوتی';
 /** آدرس اصلی سایت (برای canonical)؛ در صورت نیاز با VITE_SITE_URL تغییر دهید. */
 export const SITE_URL = ((import.meta.env.VITE_SITE_URL as string | undefined) || 'https://moniko.ir').replace(/\/$/, '');
 export const DEFAULT_TITLE = `${SITE_NAME} | فروشگاه اینترنتی لوازم آرایشی و بهداشتی`;
+/** تصویر پیش‌فرض اشتراک‌گذاری لینک (تلگرام، واتس‌اپ، ...) برای صفحاتی که تصویر خودشان را ندارند */
+export const DEFAULT_IMAGE = `${SITE_URL}/og-default.png`;
 export const DEFAULT_DESCRIPTION =
   'خرید آنلاین لوازم آرایشی، بهداشتی و مراقبتی پوست و مو با ضمانت اصالت کالا و ارسال سریع به سراسر کشور.';
 
@@ -29,7 +31,6 @@ export function buildProductJsonLd(p: Product, toAbsoluteImage: (u?: string | nu
     .filter(Boolean);
   const price = p.discountPrice && p.discountPrice > 0 ? p.discountPrice : p.price;
   const ld: Record<string, unknown> = {
-    '@context': 'https://schema.org',
     '@type': 'Product',
     name: p.name,
     sku: String(p.id),
@@ -40,11 +41,51 @@ export function buildProductJsonLd(p: Product, toAbsoluteImage: (u?: string | nu
       priceCurrency: 'IRR',
       price: String(Math.round(price * TOMAN_TO_RIAL)),
       availability: p.stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+      itemCondition: 'https://schema.org/NewCondition',
+      seller: { '@type': 'Organization', name: SITE_NAME },
     },
   };
   if (images.length) ld.image = images;
   if (p.brand) ld.brand = { '@type': 'Brand', name: p.brand };
-  return ld;
+
+  const crumbs = [{ name: SITE_NAME, url: `${SITE_URL}/` }];
+  if (p.category?.slug) crumbs.push({ name: p.category.name, url: `${SITE_URL}/categories/${encodeURIComponent(p.category.slug)}` });
+  crumbs.push({ name: p.name, url: `${SITE_URL}/products/${p.id}` });
+  return { '@context': 'https://schema.org', '@graph': [ld, breadcrumbNode(crumbs)] };
+}
+
+/** «مسیر صفحه» (BreadcrumbList) برای نمایش در نتایج گوگل */
+export function breadcrumbNode(items: { name: string; url: string }[]): Record<string, unknown> {
+  return {
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((it, i) => ({ '@type': 'ListItem', position: i + 1, name: it.name, item: it.url })),
+  };
+}
+
+/** صفحه‌ی دسته‌بندی: CollectionPage + مسیر صفحه */
+export function buildCategoryJsonLd(name: string, slug: string): Record<string, unknown> {
+  const url = `${SITE_URL}/categories/${encodeURIComponent(slug)}`;
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [
+      { '@type': 'CollectionPage', name, url },
+      breadcrumbNode([{ name: SITE_NAME, url: `${SITE_URL}/` }, { name, url }]),
+    ],
+  };
+}
+
+/** صفحه‌ی اصلی: WebSite (با جستجو) + Organization */
+export function buildHomeJsonLd(): Record<string, unknown> {
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebSite', name: SITE_NAME, url: `${SITE_URL}/`,
+        potentialAction: { '@type': 'SearchAction', target: `${SITE_URL}/search?q={search_term_string}`, 'query-input': 'required name=search_term_string' },
+      },
+      { '@type': 'Organization', name: SITE_NAME, url: `${SITE_URL}/`, logo: DEFAULT_IMAGE },
+    ],
+  };
 }
 
 // ---------------------------------------------------------------- DOM helpers
@@ -84,7 +125,8 @@ function applySeo(o: SeoOptions) {
   upsertMeta('property', 'og:type', o.type || 'website');
   upsertMeta('property', 'og:title', title);
   upsertMeta('property', 'og:description', description);
-  if (o.image) upsertMeta('property', 'og:image', o.image);
+  upsertMeta('property', 'og:image', o.image || DEFAULT_IMAGE);
+  upsertMeta('name', 'twitter:card', 'summary_large_image');
   if (o.path) {
     const href = SITE_URL + o.path;
     upsertMeta('property', 'og:url', href);
@@ -110,6 +152,9 @@ function resetSeo() {
   document.title = DEFAULT_TITLE;
   const d = document.head.querySelector('meta[name="description"]');
   if (d) d.setAttribute('content', DEFAULT_DESCRIPTION);
+  // متاهای ثابت index.html هم به حالت پیش‌فرض برگردند
+  document.head.querySelector('meta[property="og:type"]')?.setAttribute('content', 'website');
+  document.head.querySelector('meta[property="og:image"]')?.setAttribute('content', DEFAULT_IMAGE);
 }
 
 /**

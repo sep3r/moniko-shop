@@ -24,7 +24,7 @@ export default function HeroSlider({ banners }: { banners: Banner[] }) {
         <div className="kh-hero-track" style={{ transform: `translateX(${i * 100}%)` }}>
           {banners.map((b) => (
             <SmartLink key={b.id} to={b.linkUrl} className="kh-hero-slide" title={b.title}>
-              <img src={getProductImageUrl(b.imageUrl)} alt={b.title || ''} loading={b.id === banners[0].id ? 'eager' : 'lazy'} />
+              <img src={getProductImageUrl(b.imageUrl)} alt={b.title || ''} loading={b.id === banners[0].id ? 'eager' : 'lazy'} fetchPriority={b.id === banners[0].id ? 'high' : 'auto'} decoding="async" />
             </SmartLink>
           ))}
         </div>

@@ -69,7 +69,7 @@ public class AuthService {
                 .authorities("ROLE_USER")
                 .build();
 
-        String token = jwtUtil.generateToken(userDetails, user.getPassword());
+        String token = jwtUtil.generateToken(userDetails, user.getPassword(), Boolean.TRUE.equals(request.getRememberMe()));
 
         return AuthResponse.builder()
                 .token(token)
@@ -115,9 +115,10 @@ public class AuthService {
         // ثبت زمان آخرین ورود موفق
         user.setLastLoginAt(Instant.now());
         userRepository.save(user);
-        auditService.log(AuditEvent.LOGIN_SUCCESS, user.getId(), user.getEmail(), null);
+        auditService.log(AuditEvent.LOGIN_SUCCESS, user.getId(), user.getEmail(),
+                Boolean.TRUE.equals(request.getRememberMe()) ? "remember-me" : null);
 
-        String token = jwtUtil.generateToken(userDetails, user.getPassword());
+        String token = jwtUtil.generateToken(userDetails, user.getPassword(), Boolean.TRUE.equals(request.getRememberMe()));
 
         return AuthResponse.builder()
                 .token(token)
@@ -172,7 +173,7 @@ public class AuthService {
                 .build();
 
         return AuthResponse.builder()
-                .token(jwtUtil.generateToken(userDetails, user.getPassword()))
+                .token(jwtUtil.generateToken(userDetails, user.getPassword(), Boolean.TRUE.equals(request.getRememberMe())))
                 .id(user.getId())
                 .email(user.getEmail())
                 .fullName(user.getFullName())

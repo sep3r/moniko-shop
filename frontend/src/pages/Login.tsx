@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [remember, setRemember] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
@@ -15,7 +16,7 @@ export default function Login() {
     setError('');
     setLoading(true);
     try {
-      await login(email, password);
+      await login(email, password, remember);
       navigate('/');
     } catch (err: any) {
       setError(
@@ -42,6 +43,10 @@ export default function Login() {
             <label>رمز عبور</label>
             <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required placeholder="••••••••" />
           </div>
+          <label className="remember-row">
+            <input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} />
+            <span>مرا به خاطر بسپار <small>(۳ روز نیازی به ورود دوباره نیست)</small></span>
+          </label>
           <button type="submit" className="btn btn-primary" disabled={loading}>
             {loading ? 'در حال ورود...' : 'ورود'}
           </button>

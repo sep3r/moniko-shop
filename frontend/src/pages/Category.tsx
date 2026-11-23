@@ -2,7 +2,7 @@ import { Link, useParams } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import Pager from '../components/Pager';
 import { useListingParams, useProductList } from '../utils/useProductList';
-import { SITE_NAME, useSeo } from '../utils/seo';
+import { SITE_NAME, buildCategoryJsonLd, useSeo } from '../utils/seo';
 
 const PAGE_SIZE = 24;
 const fa = (n: number) => new Intl.NumberFormat('fa-IR').format(n);
@@ -20,7 +20,8 @@ export default function Category() {
     title: `${name} | خرید آنلاین ${name} | ${SITE_NAME}`,
     description: `خرید اینترنتی ${name} با بهترین قیمت و ضمانت اصالت کالا از ${SITE_NAME}.`,
     path: `/categories/${slug}`,
-  } : {});
+    jsonLd: buildCategoryJsonLd(name, slug || ''),
+  } : { noindex: notFound });   // دسته‌ی ناموجود نباید به‌عنوان «soft 404» ایندکس شود
 
   if (loading && !data) return <div className="loading">در حال بارگذاری...</div>;
 

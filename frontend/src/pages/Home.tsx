@@ -11,7 +11,7 @@ import BannerRow from '../components/BannerRow';
 import ProductCard from '../components/ProductCard';
 import Countdown from '../components/Countdown';
 import SmartLink from '../components/SmartLink';
-import { DEFAULT_DESCRIPTION, DEFAULT_TITLE, SITE_NAME, SITE_URL, useSeo } from '../utils/seo';
+import { DEFAULT_DESCRIPTION, DEFAULT_TITLE, buildHomeJsonLd, useSeo } from '../utils/seo';
 
 /** شناسه‌ی یک دسته و همه‌ی زیرمجموعه‌هایش */
 const collectIds = (c: Category): number[] => [c.id, ...(c.children || []).flatMap(collectIds)];
@@ -54,13 +54,7 @@ export default function Home() {
     title: DEFAULT_TITLE,
     description: DEFAULT_DESCRIPTION,
     path: '/',
-    jsonLd: {
-      '@context': 'https://schema.org',
-      '@type': 'WebSite',
-      name: SITE_NAME,
-      url: SITE_URL + '/',
-      potentialAction: { '@type': 'SearchAction', target: `${SITE_URL}/search?q={search_term_string}`, 'query-input': 'required name=search_term_string' },
-    },
+    jsonLd: buildHomeJsonLd(),
   });
 
   const aboutTitle = useSetting('about_title', 'خرید لوازم آرایشی و بهداشتی از فروشگاه اینترنتی مونا بیوتی');

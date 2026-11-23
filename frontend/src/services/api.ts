@@ -25,13 +25,13 @@ api.interceptors.request.use((config) => {
 });
 
 export const authApi = {
-  register: (data: { fullName: string; email: string; password: string; phone?: string }) =>
+  register: (data: { fullName: string; email: string; password: string; phone?: string; rememberMe?: boolean }) =>
     api.post('/auth/register', data),
-  login: (data: { email: string; password: string }) =>
+  login: (data: { email: string; password: string; rememberMe?: boolean }) =>
     api.post('/auth/login', data),
   me: () => api.get('/auth/me'),
-  changePassword: (currentPassword: string, newPassword: string) =>
-    api.post('/auth/change-password', { currentPassword, newPassword }),
+  changePassword: (currentPassword: string, newPassword: string, rememberMe?: boolean) =>
+    api.post('/auth/change-password', { currentPassword, newPassword, rememberMe }),
   forgotPassword: (email: string) => api.post('/auth/forgot-password', { email }),
   resetPassword: (token: string, newPassword: string) =>
     api.post('/auth/reset-password', { token, newPassword }),

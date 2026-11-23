@@ -27,4 +27,7 @@ public class RegisterRequest {
     @Size(max = 20, message = "شماره تماس نامعتبر است")
     @Pattern(regexp = "^[0-9\\u06F0-\\u06F9\\u0660-\\u0669+\\- ]*$", message = "شماره تماس نامعتبر است")
     private String phone;
+
+    /** «مرا به خاطر بسپار»: توکن بلندمدت‌تر. اختیاری. */
+    private Boolean rememberMe;
 }
